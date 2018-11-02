@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.rsd.dao.UsersMapper">
+        <select id="findMenusByUserId" resultType="cn.rsd.po.Menu">
+                SELECT
+                menu.id,
+                menu.menu_name,
+                menu.category,
+                menu.icon,
+                menu.url,
+                menu.seq
+                FROM
+                menu ,
+                role_menu ,
+                users
+                WHERE
+                menu.id = role_menu.menu_id AND
+                role_menu.role_id = users.role AND
+                users.id = #{id}
+                order by menu.category,menu.seq
+        </select>
+        <select id="selectUserByAccountAndRowBounds" resultType="cn.rsd.po.Users" parameterType="cn.rsd.po.Users">
+                SELECT
+                    a.*,b.balance
+                FROM
+                    users a
+                        LEFT JOIN
+                    user_account b ON a.id = b.user_id
+                <where>
+                        <if test="userName != null and userName != ''">
+                                a.user_name = #{userName}
+                        </if>
+                        and a.role = 4
+                </where>
+        </select>
+</mapper>

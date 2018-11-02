@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.rsd.dao.BuyerOrderMapper">
+
+    <select id="selectPriceByMonth" resultType="java.util.HashMap">
+         SELECT
+        sum(t2.price) price,
+        order_date,
+        company,
+        buyer
+    FROM
+        (
+            SELECT
+            t1.company,
+            t.buyer,
+            t.price,
+            DATE_FORMAT(t.create_date, '%c月份') order_date
+            FROM
+            buyer_order t,
+            users t1
+            <where>
+                <if test="buyer != null">
+                    buyer = #{buyer}
+                </if>
+                and
+                state = 4
+                and
+                t.buyer = t1.id
+            </where>
+        ) t2
+    GROUP BY
+        t2.order_date,t2.buyer
+    ORDER BY
+        t2.order_date
+    </select>
+
+    <select id="selectPriceByYear" resultType="java.util.HashMap">
+        SELECT
+        sum(t2.price) price,
+        order_date,
+        company,
+        buyer
+        FROM
+        (
+            SELECT
+            t1.company,
+            t.buyer,
+            t.price,
+            DATE_FORMAT(t.create_date, '%c月份') order_date
+            FROM
+            buyer_order t,
+            users t1
+            <where>
+                <if test="buyer != null">
+                    buyer = #{buyer}
+                </if>
+                and
+                state = 4
+                and
+                t.buyer = t1.id
+            </where>
+        ) t2
+        GROUP BY
+        t2.order_date,t2.buyer
+        ORDER BY
+        t2.order_date
+    </select>
+</mapper>

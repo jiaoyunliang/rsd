@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+    <context:property-placeholder location="classpath:system.properties"/>
+    <context:component-scan base-package="cn.rsd.web">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController"/>
+    </context:component-scan>
+    <mvc:default-servlet-handler/>
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+            <!-- FastJsonHttpMessageConverter4 使@ResponseBody支持返回Map<String,Object>等类型,它会自动转换为json-->
+            <!-- 需要返回json时需要配置 produces = "application/json"。不需要再指定utf-8了 -->
+            <bean id="fastJsonHttpMessageConverter" class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4">
+                <!-- 加入支持的媒体类型 -->
+                <property name="supportedMediaTypes">
+                    <list>
+                        <!-- 这里顺序不能反，一定先写text/html，不然IE执行AJAX时,返回JSON会出现下载文件 -->
+                        <value>text/html;charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                        <value>application/xml;charset=UTF-8</value>
+                    </list>
+                </property>
+                <property name="fastJsonConfig">
+                    <bean class="com.alibaba.fastjson.support.config.FastJsonConfig">
+                        <property name="features">
+                            <list>
+                                <value>AllowArbitraryCommas</value>
+                                <value>AllowUnQuotedFieldNames</value>
+                                <value>DisableCircularReferenceDetect</value>
+                                <value>InitStringFieldAsEmpty</value>
+                            </list>
+                        </property>
+                        <property name="serializerFeatures">
+                            <list>
+                                <value>WriteNullStringAsEmpty</value>
+                                <value>WriteNullListAsEmpty</value>
+                                <value>WriteMapNullValue</value>
+                                <value>WriteNullBooleanAsFalse</value>
+                            </list>
+                        </property>
+                        <property name="dateFormat" value="yyyy-MM-dd HH:mm:ss"/>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!-- SpringResourceTemplateResolver自动与Spring自己集成 -->
+    <!-- 资源解决基础设施, 强烈推荐。 -->
+    <bean id="templateResolver"
+          class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/views/" />
+        <property name="suffix" value=".html" />
+        <property name="characterEncoding" value="UTF-8"/>
+        <!-- HTML是默认值, 为了清楚起见, 在此处添加。 -->
+        <property name="templateMode" value="HTML" />
+        <!-- 默认情况下, 模板缓存为true。如果您想要设置为false -->
+        <!-- 模板在修改时自动更新。 -->
+        <property name="cacheable" value="false" />
+    </bean>
+
+    <!-- SpringTemplateEngine自动应用SpringStandardDialect并 -->
+    <!-- 使用Spring自己的MessageSource消息解析机制。 -->
+    <bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolver" ref="templateResolver" />
+        <property name="additionalDialects">
+            <set>
+                <bean class="nz.net.ultraq.thymeleaf.LayoutDialect"/>
+            </set>
+        </property>
+        <!-- 使用Spring 4.2.4或更高版本启用Spring EL编译器 -->
+        <!-- 可以加快大多数情况下的执行速度, 但是当一个模板中 -->
+        <!-- 的表达式在不同数据类型之间重用时, -->
+        <!-- 可能与特定情况不兼容, 因此该标志默认为“false” -->
+        <!-- 以实现更安全的向后兼容性。 -->
+        <property name="enableSpringELCompiler" value="true" />
+    </bean>
+
+    <bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine" />
+        <property name="characterEncoding" value="UTF-8"/>
+    </bean>
+    <!--Only needed because we require fileupload in the org.springframework.samples.mvc.fileupload package -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- set the max upload size100MB -->
+        <property name="maxUploadSize">
+            <value>10485760</value>
+        </property>
+        <property name="maxInMemorySize">
+            <value>4096</value>
+        </property>
+        <property name="resolveLazily">
+            <value>true</value>
+        </property>
+    </bean>
+    <bean id="conversionService"
+          class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="formatters">
+            <set>
+                <bean class="cn.rsd.MyFormatter"></bean>
+            </set>
+        </property>
+    </bean>
+    <!-- 拦截器 -->
+    <mvc:interceptors>
+        <!-- 多个拦截器，顺序执行 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/js/**"/>
+            <mvc:exclude-mapping path="/css/**"/>
+            <mvc:exclude-mapping path="/img/**"/>
+            <mvc:exclude-mapping path="/fonts/**"/>
+            <mvc:exclude-mapping path="/index.html"/>
+            <mvc:exclude-mapping path="/login"/>
+            <mvc:exclude-mapping path="/location"/>
+            <mvc:exclude-mapping path="/admin/**"/>
+            <mvc:exclude-mapping path="/wx/**"/>
+            <mvc:exclude-mapping path="/uploadPath/*"/>
+            <bean class="cn.rsd.LoginInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+</beans>

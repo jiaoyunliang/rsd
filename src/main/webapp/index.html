@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>热速达</title>
+    <link rel="stylesheet" href="css/weui.css"/>
+    <link rel="stylesheet" href="css/weui2.css"/>
+    <link rel="stylesheet" href="css/weui3.css"/>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/example.js"></script>
+    <style>
+        a[disable]{ opacity:0.5; cursor:default; pointer-events:none}
+    </style>
+</head>
+<body>
+<div class="container" id="container">
+    <form id="form">
+    <div class="weui_cells weui_cells_form">
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">用户名</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="text" required maxlength="11" id="userName" name="userName" placeholder="输入你的用户名" emptyTips="请输入用户名" notMatchTips="请输入正确的用户名">
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">密&nbsp;&nbsp;码</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="password" id="userPass" name="userPass" required placeholder="输入你的密码" tips="请输入密码">
+            </div>
+        </div>
+    </div>
+    <div class="weui_btn_area">
+        <a id="formSubmitBtn" href="javascript:" class="weui_btn weui_btn_primary">登录</a>
+    </div>
+    </form>
+</div>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+<script type="text/javascript">
+    var pageurl = encodeURIComponent(window.location.href.split("#")[0]);
+    $.getJSON("wx/jssignature",{pageurl:pageurl},function(result){
+        wx.config({
+            debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: result.data.appId, // 必填，公众号的唯一标识
+            timestamp: result.data.timestamp, // 必填，生成签名的时间戳
+            nonceStr: result.data.nonceStr, // 必填，生成签名的随机串
+            signature: result.data.signature,// 必填，签名
+            jsApiList: ['chooseImage','getLocation','openLocation','uploadImage',''] // 必填，需要使用的JS接口列表
+        });
+    });
+    var latitude,longitude;
+    wx.ready(function(){
+        wx.getLocation({
+            type: 'gcj02', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+            success: function (res) {
+                latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+                longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+                var speed = res.speed; // 速度，以米/每秒计
+                var accuracy = res.accuracy; // 位置精度
+
+
+                $.post("location",{latitude:latitude,longitude:longitude,openid:getQueryString("openid")},function () {
+
+                });
+            }
+        });
+    });
+
+    function openLoc() {
+        wx.openLocation({
+            latitude: latitude, // 纬度，浮点数，范围为90 ~ -90
+            longitude: longitude, // 经度，浮点数，范围为180 ~ -180。
+            name: '我的位置', // 位置名
+            address: '', // 地址详情说明
+            scale: 1, // 地图缩放级别,整形值,范围从1~28。默认为最大
+            infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
+        });
+    }
+    $(function(){
+        var $form = $("#form");
+        $form.form();
+        $("#formSubmitBtn").on("click", function(){
+            $form.validate(function(error){
+                if(error){
+
+                }else{
+                    $.post("login",
+                            {
+                                userName:$("#userName").val(),
+                                userPass:$("#userPass").val(),
+                                openid:getQueryString("openid")
+                            },
+                            function(data,status){
+                                if(data.code == "200"){
+                                    if(data.data.referer){
+                                        top.location=data.data.referer;
+                                    }else{
+                                        if(data.data.user.role == 2){
+                                            top.location='order.html';
+                                        }else if(data.data.user.role == 3){
+                                            top.location='order_send.html';
+                                        }else if(data.data.user.role == 4){
+                                            top.location='order_new.html';
+                                        }
+                                    }
+                                }else{
+                                    $.toptips(data.msg);
+                                }
+                            },"json");
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

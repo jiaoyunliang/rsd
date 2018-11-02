@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>热速达</title>
+    <link rel="stylesheet" href="../css/weui.css"/>
+    <link rel="stylesheet" href="../css/weui2.css"/>
+    <link rel="stylesheet" href="../css/weui3.css"/>
+    <script src="../js/zepto.min.js"></script>
+    <script src="../js/php.js"></script>
+    <script src="../js/example.js"></script>
+</head>
+<body ontouchstart class='page-bg'>
+<div class="weui-pay">
+</div>
+<div class="weui_cells_title">选择支付方式</div>
+<div class="weui_cells weui_cells_checkbox">
+    <label class="weui_cell weui_check_label" for="s11">
+        <div class="weui_cell_hd">
+            <input type="radio" class="weui_check" name="payType" id="s11" value="1" checked="checked">
+            <i class="weui_icon_checked"></i>
+        </div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>余额</p>
+        </div>
+    </label>
+    <label class="weui_cell weui_check_label" for="s12">
+        <div class="weui_cell_hd">
+            <input type="radio" class="weui_check" name="payType" value="2" id="s12">
+            <i class="weui_icon_checked"></i>
+        </div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>微信</p>
+        </div>
+    </label>
+    <label class="weui_cell weui_check_label" for="s13">
+        <div class="weui_cell_hd">
+            <input type="radio" class="weui_check" name="payType" value="3" id="s13">
+            <i class="weui_icon_checked"></i>
+        </div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>支付宝</p>
+        </div>
+    </label>
+</div>
+<div class="weui_btn_area">
+    <a href="javascript:;" class="weui_btn weui_btn_primary" id="pay">立即支付</a>
+</div>
+
+<script id="tpl" type="text/html">
+    <h1 class="weui-payselect-title">热量费用</h1>
+    <p class="weui-pay-num">￥<%=order.price%></p>
+    <ul class="weui-pay-u">
+        <li>
+            <span class="title">订单号</span>
+            <span class="content"><%=order.orderCode%></span>
+            <input type="hidden" id="orderCode" value="<%=order.orderCode%>"/>
+            <input type="hidden" id="price" value="<%=order.price%>"/>
+        </li>
+        <%if(truck){%>
+        <li>
+            <span class="title">运送车辆</span>
+            <span class="content"><%=truck.plateNumber%></span>
+        </li>
+        <%}%>
+    </ul>
+
+</script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+$(function(){
+
+    var pageurl = encodeURIComponent(window.location.href.split("#")[0]);
+    $.getJSON("../wx/jssignature",{pageurl:pageurl},function(result){
+        wx.config({
+            debug:true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: result.data.appId, // 必填，公众号的唯一标识
+            timestamp: result.data.timestamp, // 必填，生成签名的时间戳
+            nonceStr: result.data.nonceStr, // 必填，生成签名的随机串
+            signature: result.data.signature,// 必填，签名
+            jsApiList: ['chooseImage','getLocation','openLocation','uploadImage','chooseWXPay'] // 必填，需要使用的JS接口列表
+        });
+    });
+
+    var id = getQueryString("id");
+
+    $.getJSON("../order/get?id="+id,function(result){
+        var tplx = document.getElementById('tpl').innerHTML;
+        var desc1=tpl(tplx,result.data);
+        $('.weui-pay').html(desc1);
+
+        $("#pay").on('click',function(e){
+            e.preventDefault();
+
+            var payType = $("input[name='payType']:checked").val();
+            $.showLoading("提交中...");
+            switch (payType){
+                case '1':
+                    $.post("../order/pay",
+                            {
+                                id:id
+                            },
+                            function(data){
+                                $.hideLoading();
+                                if(data.code == "200"){
+                                    top.location = "order_msg.html";
+                                }else{
+                                    $.toast(data.msg,"forbidden");
+                                }
+                            },"json");
+                    break;
+                case '2':
+                    $.post("../order/weixin",
+                            {
+                                id:id,
+                                orderCode:$("#orderCode").val(),
+                                fee:$("#price").val()
+                            },
+                            function(data){
+                                $.hideLoading();
+                                if(data.code == "200"){
+                                    wx.chooseWXPay({
+                                        timestamp: data.data.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                                        nonceStr: data.data.nonceStr, // 支付签名随机串，不长于 32 位
+                                        package: data.data.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                                        signType: data.data.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                                        paySign: data.data.paySign, // 支付签名
+                                        success: function (res) {
+                                            // 支付成功后的回调函数
+                                        }
+                                    });
+                                }else{
+                                    $.toast(data.msg,"forbidden");
+                                }
+                            },"json");
+                    break;
+                case '3':
+                    $.hideLoading();
+                    $.toast("禁止操作","forbidden");
+
+                    break;
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

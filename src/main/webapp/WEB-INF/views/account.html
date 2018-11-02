@@ -1,0 +1,236 @@
+<!doctype html>
+<html class="no-js fixed-layout" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layout}">
+<head th:include="layout/layout :: htmlhead" th:with="title='用户余额管理'">
+  <meta charset="utf-8">
+  <title></title>
+</head>
+<body>
+<th:block layout:fragment="content">
+  <div class="tpl-content-wrapper">
+    <div class="row-content am-cf">
+      <div class="row">
+        <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+          <div class="widget am-cf">
+            <div class="widget-head am-cf">
+              <div class="widget-title  am-cf">充值管理</div>
+            </div>
+            <div class="widget-body  am-fr">
+              <div class="am-u-sm-12">
+                <form id="searchFrm" onsubmit="return false;" class="am-form">
+                  <div class="am-u-md-6 am-u-lg-3">
+                    <div class="am-form-group">
+                      <input type="text" class="am-form-field am-input-sm" name="userName" placeholder="请输入用户名">
+                    </div>
+                  </div>
+                  <div class="am-u-md-6 am-u-lg-3 am-u-end">
+                    <div class="am-input-group am-input-group-sm tpl-form-border-form cl-p">
+                      <button class="am-btn am-btn-success" onclick="search();">
+                        <i class="am-icon-search"></i>
+                        搜索
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="am-u-sm-12">
+                <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black am-text-nowrap" id="example-r">
+                  <thead>
+                  <tr>
+                    <th>用户名</th>
+                    <th>地址</th>
+                    <th>公司名</th>
+                    <th>电话</th>
+                    <th>余额(元)</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="am-modal am-modal-confirm" tabindex="-1" id="my-confirm">
+    <div class="am-modal-dialog">
+      <div class="am-modal-hd">职工管理</div>
+      <div class="am-modal-bd">
+        你，确定要删除这条记录吗？
+      </div>
+      <div class="am-modal-footer">
+        <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+        <span class="am-modal-btn" data-am-modal-confirm>确定</span>
+      </div>
+    </div>
+  </div>
+  <th:block th:replace="form/account :: html"></th:block>
+  <div class="am-popup" id="account-log-popup">
+    <div class="am-popup-inner">
+      <div class="am-popup-hd">
+        <h4 class="am-popup-title">交易记录</h4>
+        <span data-am-modal-close
+              class="am-close">&times;</span>
+      </div>
+      <div class="am-popup-bd">
+        <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black am-text-nowrap" id="account-log-r">
+          <thead>
+          <tr>
+            <th>账户余额(元)</th>
+            <th>微信(元)</th>
+            <th>支付宝(元)</th>
+            <th>交易类型</th>
+            <th>交易时间</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</th:block>
+</body>
+</html>
+<script type="text/javascript">
+  var _ctx = $("meta[name='ctx']").attr("content");
+  var accountLogTable = null;
+  if(!_ctx){
+    _ctx = "";
+  }
+  $(document).ready(function(){
+    $('#example-r').DataTable({
+      ajax: {
+        url:_ctx+"/admin/account/list",
+        type: "POST",
+        dataType : 'json',
+        data:function (d) {
+          var query = serializeForm("#searchFrm")
+          d.columns = null;
+          return $.extend( true, d,  query);
+        }
+      },
+      responsive: true,
+      stateDuration: -1,
+      processing: true,
+      serverSide: true,
+      lengthChange:false,
+      destroy:true,
+      retrieve:true,
+      fixedColumns:{
+        leftColumns: 0,
+        rightColumns: 1
+      },
+      columns: [
+        {data: "userName" },
+        {data: "address" },
+        {data: "company" },
+        {data: "phone" },
+        {data: "balance", render:function (data) {
+          return accDiv(data,100);
+        }},
+        {data: "state" ,render :function(data,type,row,meta){
+          var state;
+          switch (data){
+            case 0:
+              state = "禁用";
+              break;
+            case 1:
+              state = "正常";
+              break;
+            default:
+              state = "未知";
+          }
+          return state
+        }},
+        {data: null,render :function () {
+          var btnHtml =   '<div class="tpl-table-black-operation">'
+                  +'<a href="javascript:;" id="editLog"><i class="am-icon-reorder"></i>交易记录</a>&nbsp;'
+                  +'<a href="javascript:;" id="edit"><i class="am-icon-credit-card"></i>充值</a></div>';
+          return btnHtml;
+        }}
+      ]
+    });
+
+    /**
+     * 查看修改
+     */
+    $('#example-r tbody').on( 'click', 'a#edit', function () {
+      var tr = $(this).parents('tr');
+      var data = $('#example-r').DataTable().row(tr).data();
+      fillFrm(data,"#frm-employee");
+    });
+
+    $('#example-r tbody').on( 'click', 'a#editLog', function () {
+      var tr = $(this).parents('tr');
+      var data = $('#example-r').DataTable().row(tr).data();
+
+      $('#account-log-popup').modal("open");
+
+      if(accountLogTable){
+        accountLogTable.destroy();
+      }
+
+      accountLogTable = $('#account-log-r').DataTable({
+        ajax: {
+          url:_ctx+"/admin/user/track/list",
+          type: "POST",
+          dataType : 'json',
+          data:function (d) {
+            var query = {userId:data.id}
+            d.columns = null;
+            return $.extend( true, d,  query);
+          }
+        },
+        responsive: true,
+        stateDuration: -1,
+        processing: true,
+        serverSide: true,
+        lengthChange:false,
+        columns: [
+          {data: "accountBalance", render:function (data) {
+            if(!data){
+              data=0;
+            }
+            return accDiv(data,100);
+          }},
+          {data: "alipay", render:function (data) {
+            if(!data){
+              data=0;
+            }
+            return accDiv(data,100);
+          } },
+          {data: "weixin", render:function (data) {
+            if(!data){
+              data=0;
+            }
+            return accDiv(data,100);
+          } },
+          {data: "trackType", render:function (data) {
+            var state;
+            switch (data){
+              case 1:
+                state = "充值";
+                break;
+              case 2:
+                state = "消费";
+                break;
+              default:
+                state = "未知";
+            }
+            return state
+          }},
+          {data: "createDate"}
+        ]
+      });
+    });
+  });
+
+  function search(){
+    var table = $('#example-r').DataTable();
+    table.ajax.reload(null,false);
+  }
+</script>

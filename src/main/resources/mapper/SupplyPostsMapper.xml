@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.rsd.dao.SupplyPostsMapper">
+<insert id="insertSupplyUser" parameterType="cn.rsd.po.SupplyPostUser">
+        INSERT INTO`supply_posts_user`
+        (`supply_id`,
+        `user_id`)
+        VALUES
+        (#{supplyId},
+        #{userId})
+
+</insert>
+
+<delete id="delSupplyUser" parameterType="cn.rsd.po.SupplyPostUser">
+        DELETE FROM `supply_posts_user`
+        WHERE supply_id = #{supplyId} and user_id = #{userId}
+</delete>
+
+<select id="selectUserBySupplyPosts" resultType="cn.rsd.po.Users">
+        SELECT
+            a.*
+        FROM
+            users a
+                INNER JOIN
+            supply_posts_user b ON a.id = b.user_id AND b.supply_id =#{supplyPostId}
+</select>
+
+<select id="selectSupplyPostsByUser" resultType="cn.rsd.po.SupplyPosts">
+        SELECT
+            a.*
+        FROM
+            supply_posts a
+                INNER JOIN
+            supply_posts_user b ON a.id = b.supply_id AND b.user_id = 5
+</select>
+</mapper>

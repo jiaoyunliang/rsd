@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="am-popup" id="my-popup" data->
+    <div class="am-popup-inner">
+        <div class="am-popup-hd">
+            <h4 class="am-popup-title">编辑窗口</h4>
+            <span data-am-modal-close
+                  class="am-close">&times;</span>
+        </div>
+        <div class="am-popup-bd">
+            <div class="widget am-cf">
+                <div class="widget-body am-fr">
+                    <form class="am-form tpl-form-line-form" method="post" id="frm-employee" action="" onsubmit="return false;">
+                        <div id="showError" class="am-alert am-alert-warning" style="display: none;" data-am-alert>
+                            <button type="button" class="am-close">&times;</button>
+                            <p id="showErrorMsg"></p>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="supplyName" class="am-u-sm-3 am-form-label">名称: </label>
+                                <div class="am-u-sm-9">
+                                    <input type="hidden" name="id"/>
+                                    <input type="text" class="tpl-form-input" id="supplyName" name="supplyName" placeholder="请输入文字" maxlength="100" required>
+                                </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="address" class="am-u-sm-3 am-form-label">地址: </label>
+                                <div class="am-u-sm-9">
+                                    <input type="text" class="tpl-form-input" id="address" name="address" placeholder="请输入文字" maxlength="200" required>
+                                </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="adminId" class="am-u-sm-3 am-form-label">管理员: </label>
+                            <div class="am-u-sm-9">
+                                <select data-am-selected id="adminId" name="adminId">
+                                    <option th:each="admin,stat1 : ${adminList}" th:value="${admin.id}" th:text="${admin.company}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <div class="am-u-sm-9 am-u-sm-push-3">
+                                <button type="submit" id="employeeBtn" data-am-loading="{spinner: 'circle-o-notch',loadingText: '保存中...'}" class="am-btn am-btn-default am-btn-secondary"><span class="am-icon-save"></span> 保存</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var _ctx = $("meta[name='ctx']").attr("content");
+    $(function() {
+        $('#my-popup').on('closed.modal.amui', function() {
+            $(this).removeData('amui.modal');
+            $("#frm-employee")[0].reset();
+            $("#id").val("");
+            $("#frm-employee .am-form-success").removeClass("am-form-success");
+            $("#frm-employee .am-form-error").removeClass("am-form-error");
+            $("#frm-employee .am-field-valid").removeClass("am-field-valid");
+            $("#frm-employee .am-field-error").removeClass("am-field-error");
+            $("#frm-employee select").find('option').eq(0).attr('selected', true);
+            $("#frm-employee select").trigger('changed.selected.amui');
+            $("#frm-employee").find(".am-alert").hide();
+            search();
+        });
+
+        $('#frm-employee').validator({
+            onValid: function(validity) {
+                $(validity.field).closest('.am-form-group').find('.am-alert').hide();
+            },
+            onInValid: function(validity) {
+                var $field = $(validity.field);
+
+                var $group = $field.closest('.am-u-sm-9');
+                var $alert = $group.find('.am-alert');
+                console.log("log===="+$field.attr('name'));
+                // 使用自定义的提示信息 或 插件内置的提示信息
+                var msg = $field.data('validationMessage') || this.getValidationMessage(validity);
+                console.log("log===="+msg);
+                if (!$alert.length) {
+                    $alert = $('<div class="am-alert am-alert-danger"></div>').hide().
+                    appendTo($group);
+                }
+
+                $alert.html(msg).show();
+            },
+            submit: function() {
+                var formValidity = this.isFormValid();
+
+                if(formValidity){
+                    $("#employeeBtn").button('loading');
+                    // 验证成功的逻辑
+                    var values = serializeForm("#frm-employee");
+
+                    $.post( _ctx + '/admin/supply/save',values,function (data,status) {
+                        if (data.code == 200 && status == "success") {
+                            $("#my-popup").modal('close');
+                        }else{
+                            $('#showErrorMsg').text(data.msg);
+                            $('#showError').show();
+                        }
+                        $("#employeeBtn").button('reset');
+                    },"json");
+                }
+                return false;
+            }
+        });
+
+        if (!$.AMUI.support.mutationobserver) {
+            $selected.trigger('changed.selected.amui');
+        }
+    });
+
+    function fillFrm(data,frmId) {
+        $("#my-popup").modal('open');
+
+        var key,value,tagName,type,arr;
+        for(x in data){
+            key = x;
+            value = data[x];
+
+            $(frmId + " [name='"+key+"'],[name='"+key+"[]']").each(function(){
+                tagName = $(this)[0].tagName;
+                type = $(this).attr('type');
+                if(tagName=='INPUT'){
+                    if(type=='radio'){
+                        if($(this).val()==value){
+                            $(this).uCheck('check');
+                            return true;
+                        }
+
+                    }else if(type=='checkbox'){
+                        arr = value.split(',');
+                        for(var i =0;i<arr.length;i++){
+                            if($(this).val()==arr[i]){
+                                $(this).uCheck('check');
+                            }else{
+                                $(this).uCheck('uncheck');
+                            }
+                        }
+                    }else{
+                        $(this).val(value);
+                    }
+                }else if(tagName=='SELECT'){
+                    var index = $(this).find('option[value='+value+']').index();
+                    $(this).selected('select', index);
+                }else if(tagName=='TEXTAREA'){
+                    $(this).val(value);
+                }
+
+            });
+        }
+    }
+</script>
+</body>
+</html>

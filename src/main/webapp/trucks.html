@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>热速达</title>
+    <link rel="stylesheet" href="css/weui.css"/>
+    <link rel="stylesheet" href="css/weui2.css"/>
+    <link rel="stylesheet" href="css/weui3.css"/>
+    <link rel="stylesheet" href="css/order.css"/>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/updown.js"></script>
+    <script src="js/example.js"></script>
+
+</head>
+<body ontouchstart style="background-color: #f8f8f8;">
+<div class="weui_cells_title">车辆列表</div>
+<div class="weui_cells">
+</div>
+<script id="tpl" type="text/html">
+    <% for (var i = 0; i < list.length; i ++) {   %>
+    <a href="javascript:" data-val="<%=list[i].id%>">
+        <div class="weui_cell slidelefts">
+            <div class="weui_cell_bd weui_cell_primary ">
+                <span><%=list[i].plateNumber%>&nbsp;<%=truckState(list[i].state)%></span>
+            </div>
+        </div>
+    </a>
+    <%}%>
+</script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $.post("trucks/list",{},function(json){
+            var tplx = document.getElementById('tpl').innerHTML;
+            var desc1=tpl(tplx,json.data);
+            $(".weui_cells").html(desc1);
+            
+            $(document).on("click", "a", function() {
+                var id = $(this).data("val");
+                $.actions({
+                    actions: [
+                        {
+                            text: "正常",
+                            className: "color-primary",
+                            onClick:function () {
+                                $.showLoading("提交中...");
+                                $.post("trucks/normal",
+                                        {
+                                            id:id
+                                        },
+                                        function(data){
+                                            $.hideLoading();
+                                            if(data.code == "200"){
+                                                $.toast("成功!");
+                                                top.location.reload();
+                                            }else{
+                                                $.toast(data.msg,"forbidden");
+                                            }
+                                        },"json");
+                            }
+                        },
+                        {
+                            text: "停用",
+                            className: "color-danger",
+                            onClick:function () {
+                                $.showLoading("提交中...");
+                                $.post("trucks/outage",
+                                        {
+                                            id:id
+                                        },
+                                        function(data){
+                                            $.hideLoading();
+                                            if(data.code == "200"){
+                                                $.toast("成功!");
+                                                top.location.reload();
+                                            }else{
+                                                $.toast(data.msg,"forbidden");
+                                            }
+                                        },"json");
+                            }
+                        }
+                    ]
+                });
+            });
+
+        },"json");
+
+    });
+</script>
+<script src="js/slideleft.js"></script>
+</body>
+</html>

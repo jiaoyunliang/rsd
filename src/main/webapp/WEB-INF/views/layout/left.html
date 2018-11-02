@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 侧边导航栏 -->
+<div class="left-sidebar" th:fragment="left">
+    <!-- 菜单 -->
+    <ul class="sidebar-nav" th:each="menu,menuStat:${session.menus}">
+        <li class="sidebar-nav-link">
+            <a th:href="@{${menu.url}}" class="sidebar-nav-sub-title">
+                <i class="sidebar-nav-link-logo" th:classappend="${menu.icon}"></i> <th:block th:text="${menu.menuName}"></th:block>
+            </a>
+        </li>
+    </ul>
+    <!-- 公告信息信息 -->
+    <div class="tpl-sidebar-user-panel">
+        <div class="tpl-user-panel-slide-toggleable">
+        </div>
+    </div>
+</div>
+</body>
+</html>

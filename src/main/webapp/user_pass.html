@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>热速达</title>
+    <link rel="stylesheet" href="css/weui.css"/>
+    <link rel="stylesheet" href="css/weui2.css"/>
+    <link rel="stylesheet" href="css/weui3.css"/>
+    <link rel="stylesheet" href="css/order.css"/>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/php.js"></script>
+    <script src="js/example.js"></script>
+    <script src="js/picker.js"></script>
+</head>
+<body ontouchstart style="background-color: #f8f8f8;">
+<div class="page-bd">
+    <form id="form">
+    <div class="weui_cells_title">用户密码</div>
+    <div class="weui_cells weui_cells_form">
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">新密码</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" id="pass" name="pass" required type="password" />
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">确认密码</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" id="renewpass" name="renewpass" required type="password" />
+            </div>
+        </div>
+
+    </div>
+
+    </form>
+    <div class="weui_btn_area">
+        <a class="weui_btn weui_btn_primary" href="javascript:" id="formSubmitBtn">修改密码</a>
+    </div>
+    </form>
+</div>
+
+
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+    $(function(){
+
+
+        var $form = $("#form");
+        $form.form();
+        $("#formSubmitBtn").on("click", function(){
+            $.showLoading("提交中...");
+
+            if($("#pass").val() != $("#renewpass").val()){
+                $.hideLoading();
+                $.alert("两次密码输入不正确!");
+                return;
+            }
+            $form.validate(function(error){
+                $.hideLoading();
+                if(error){
+                }else{
+                    $.post("user/renew/pass",
+                            {
+                                pass:$("#pass").val()
+                            },
+                            function(data){
+                                $.hideLoading();
+                                if(data.code == "200"){
+                                    top.location = "login_user.html"
+                                }else{
+                                    $.toptips(data.msg);
+                                }
+                            },"json");
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

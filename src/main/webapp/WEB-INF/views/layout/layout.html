@@ -1,0 +1,78 @@
+<!doctype html>
+<html class="no-js fixed-layout" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:fragment="htmlhead">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><!--/*@thymesVar id="title" type=""*/-->
+    <th:block th:text="${title}"></th:block></title>
+    <meta name="ctx" th:content="${#httpServletRequest.getContextPath()}" />
+    <meta name="description" content="页面">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="icon" type="image/png" href="../i/favicon.png" th:href="@{/i/favicon.png}">
+    <link rel="apple-touch-icon-precomposed" href="../i/app-icon72x72@2x.png" th:href="@{/i/app-icon72x72@2x.png}">
+    <script src="../js/echarts.min.js" th:src="@{/js/echarts.min.js}"></script>
+    <link rel="stylesheet" href="../css/amazeui.min.css" th:href="@{/css/amazeui.min.css}"/>
+    <link rel="stylesheet" href="../css/amazeui.datatables.min.css" th:href="@{/css/amazeui.datatables.min.css}"/>
+    <link rel="stylesheet" href="../css/fixedColumns.dataTables.min.css" th:href="@{/css/fixedColumns.dataTables.min.css}"/>
+    <link rel="stylesheet" href="../css/app.css" th:href="@{/css/app.css}"/>
+    <script src="../js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+    <script src="../js/example.js" th:src="@{/js/example.js}"></script>
+</head>
+<body class="theme-white" data-type="index">
+<!--[if lte IE 9]>
+<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，Amaze UI 暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
+    以获得更好的体验！</p>
+<![endif]-->
+<div class="am-g tpl-g">
+<div th:replace="~{layout/header :: header}">Header</div>
+    <!-- sidebar start -->
+        <div th:replace="~{layout/left :: left}">left</div>
+    <!-- sidebar end -->
+    <!-- content start -->
+    <div layout:fragment="content"></div>
+    <!-- content end -->
+</div>
+<!--[if lt IE 9]>
+<script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://cdn.staticfile.org/modernizr/2.8.3/modernizr.js"></script>
+<script src="../js/amazeui.ie8polyfill.min.js" th:src="@{/js/amazeui.ie8polyfill.min.js}"></script>
+<![endif]-->
+
+<!--[if (gte IE 9)|!(IE)]><!-->
+<script src="../js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+<!--<![endif]-->
+<script src="../js/amazeui.min.js" th:src="@{/js/amazeui.min.js}"></script>
+<script src="../js/amazeui.datatables.min.js" th:src="@{/js/amazeui.datatables.js}"></script>
+<script src="../js/dataTables.responsive.min.js" th:src="@{/js/dataTables.responsive.min.js}"></script>
+<script src="../js/dataTables.fixedColumns.min.js" th:src="@{/js/dataTables.fixedColumns.min.js}"></script>
+<script src="../js/app.js" th:src="@{/js/app.js}"></script>
+<script type="text/javascript">
+    // 默认禁用搜索和排序
+    $.extend( $.fn.DataTable.defaults, {
+        searching: false,
+        ordering:  false,
+        errMode: "none"
+    });
+
+    function serializeForm(fid){
+        var params = $(fid).serializeArray();
+        var values = {};
+        for( pp in params ){
+            if(params[pp].value && $.trim(params[pp].value) != ''){
+                values[params[pp].name] = $.trim(params[pp].value);
+            }
+        }
+        return values;
+    }
+</script>
+<script>
+    if ($.AMUI && $.AMUI.validator) {
+        $.AMUI.validator.patterns.mobile = /^\s*1\d{10}\s*$/;
+        $.AMUI.validator.patterns.idcode = /^\d{6}(18|19|20)?\d{2}(0[1-9]|1[012])(0[1-9]|[12]\d|3[01])\d{3}(\d|[xX])$/
+    }
+</script>
+</body>
+</html>

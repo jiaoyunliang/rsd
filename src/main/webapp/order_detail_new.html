@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>热速达</title>
+    <link rel="stylesheet" href="css/weui.css"/>
+    <link rel="stylesheet" href="css/weui2.css"/>
+    <link rel="stylesheet" href="css/weui3.css"/>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/example.js"></script>
+</head>
+<body ontouchstart style="background-color: #f8f8f8;">
+<div class="page-bd">
+    <div class="weui-form-preview">
+    </div>
+</div>
+
+<script id="tpl" type="text/html">
+        <div class="weui-form-preview-hd">
+            <label class="weui-form-preview-label">预计价格</label>
+            <em class="weui-form-preview-value">￥<%=accDiv(order.price,100)%></em>
+        </div>
+        <div class="weui-form-preview-bd">
+            <p>
+                <label class="weui-form-preview-label">送货时间</label>
+                <span class="weui-form-preview-value"><%=order.deliveryDate.substr(0,16)%></span>
+            </p>
+            <p>
+                <label class="weui-form-preview-label">地址</label>
+                <span class="weui-form-preview-value"><%=order.address%></span>
+            </p>
+            <p>
+                <label class="weui-form-preview-label">联系电话</label>
+                <span class="weui-form-preview-value"><a href="tel:<%=order.phone%>"><%=order.phone%></a></span>
+            </p>
+            <p>
+                <label class="weui-form-preview-label">状态</label>
+                <span class="weui-form-preview-value"><%=stateText(order.state)%></span>
+            </p>
+            <p>
+                <label class="weui-form-preview-label">备注</label>
+                <span class="weui-form-preview-value"><%=order.comment%>&nbsp;</span>
+            </p>
+            <%if(truck){%>
+                <p>
+                    <label class="weui-form-preview-label">运送车辆</label>
+                    <span class="weui-form-preview-value"><%=truck.plateNumber%></span>
+                </p>
+            <%}%>
+            <%if (order.startNumber) {%>
+            <p>
+                <label class="weui-form-preview-label">开始表数</label>
+                <span class="weui-form-preview-value"><%=order.startNumber%></span>
+            </p>
+            <p>
+                <label class="weui-form-preview-label">结束表数</label>
+                <span class="weui-form-preview-value"><%=order.endNumber%></span>
+            </p>
+            <p>
+                <label class="weui-form-preview-label">实际供热量</label>
+                <span class="weui-form-preview-value"><%=order.actualNumber%>千瓦时</span>
+            </p>
+            <%}%>
+        </div>
+        <%if(order.state == 7){%>
+            <div class="weui-rater" style="display:block;text-align:center">
+                <a data-num = "0" class="weui-rater-box <%=order.starLevel > 0?'checked':''%>"> <span class="weui-rater-inner">★</span> </a>
+                <a data-num = "1" class="weui-rater-box <%=order.starLevel > 1?'checked':''%>"> <span class="weui-rater-inner">★</span> </a>
+                <a data-num = "2" class="weui-rater-box <%=order.starLevel > 2?'checked':''%>"> <span class="weui-rater-inner">★</span> </a>
+                <a data-num = "3" class="weui-rater-box <%=order.starLevel > 3?'checked':''%>"> <span class="weui-rater-inner">★</span> </a>
+                <a data-num = "4" class="weui-rater-box <%=order.starLevel > 4?'checked':''%>"> <span class="weui-rater-inner">★</span> </a>
+            </div>
+        <%}%>
+        <div id="momentsDiv">
+        </div>
+        <input type="hidden" id="id" value="<%=order.id%>"/>
+        <input type="hidden" id="state" value="<%=order.state%>"/>
+        <%if(order.state == 6){%>
+            <div class="weui-form-preview-ft">
+                <a class="weui-form-preview-btn weui-form-preview-btn-default" href="order_new.html">返回</a>
+                <a class="weui-form-preview-btn weui-form-preview-btn-primary" href="order_pay.html?id=<%=order.id%>" id="enterBtn">支付</a>
+            </div>
+        <%}%>
+</script>
+<script id="tplPic" type="text/html">
+    <%if (order.startNumber) {%>
+    <div class="weui_cells moments">
+        <div class="weui_cell moments__post">
+            <div class="weui_cell_bd">
+                <div class="thumbnails">
+                    <div class="thumbnail">
+                        <img src="<%=order.startPic%>" style="width:100%;height:100%;"/>
+                    </div>
+                    <div class="thumbnail">
+                        <img src="<%=order.endPic%>" style="width:100%;height:100%;"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%}%>
+</script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+    $(function(){
+    var id = getQueryString("id");
+
+    $.getJSON("order/get?id="+id,function(result){
+        var tplx = document.getElementById('tpl').innerHTML;
+        var desc1=tpl(tplx,result.data);
+        $('.weui-form-preview').html(desc1);
+        var tplpicx = document.getElementById('tplPic').innerHTML;
+        var desc2=tpl(tplpicx,result.data);
+        $('#momentsDiv').html(desc2);
+
+        $("#momentsDiv img").on("click",function(e){
+            var url =$(this).attr("src");
+            var host = "http://"+window.location.host+"/";
+
+            wx.previewImage({
+                current: host+url, // 当前显示图片的http链接
+                urls: [host+result.data.order.startPic,host+result.data.order.endPic] // 需要预览的图片http链接列表
+            });
+        });
+
+        //评分js
+        var arr = ["1分","2分","3分","4分","5分"];
+        var num = -1;
+        $(".weui-rater a").mouseover(function(){
+            var thisL = $(this).index();
+            for(var i = 0;i < thisL;i++){
+                $(".weui-rater a").eq(i).addClass('checked');
+            }
+            for(var i = thisL; i < 5;i++){
+                $(".weui-rater a").eq(i).removeClass('checked');
+            }
+            $(this).addClass('checked');
+        })
+        $(".weui-rater a").mouseout(function(){
+            var thisL = $(this).index();
+            for(var i = thisL; i < 5;i++){
+                $(".weui-rater a").eq(i).removeClass('checked');
+            }
+        })
+        $(".weui-rater").mouseout(function(){
+            for(var i = 0; i < num;i++){
+                $(".weui-rater a").eq(i).addClass('checked');
+            }
+        });
+
+        $(".weui-rater a").click(function(){
+            var thisL = $(this).index();
+            $(this).addClass('checked');
+
+            $.post("order/rater",{id:id,rater:thisL+1},function () {
+
+            });
+        });
+
+        $.getJSON("user",function(result1){
+            if(result1.data.user.role == 2){
+                if(result.data.order.state == 1) {
+                    $("#enterBtn").text("重新分配");
+                }
+            }else if(result1.data.user.role == 3){
+
+            }else if(result1.data.user.role == 4){
+                if(result.data.order.state == 6){
+                    $("#enterBtn").text("支付");
+                }
+            }
+        });
+    });
+
+
+});
+</script>
+</body>
+</html>

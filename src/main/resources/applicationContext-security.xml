@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:oauth2="http://www.springframework.org/schema/security/oauth2"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
+       http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-2.0.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd"
+       default-lazy-init="true">
+
+    <bean id="messageSource"
+          class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:messages_zh_CN"/>
+    </bean>
+
+    <security:http pattern="/admin/login" security="none"/>
+    <security:http pattern="/404" security="none"/>
+    <security:http pattern="/403" security="none"/>
+    <security:http pattern="/500" security="none"/>
+    <security:http pattern="/css" security="none"/>
+    <security:http pattern="/img" security="none"/>
+    <security:http pattern="/fonts" security="none"/>
+    <security:http pattern="/i/examples" security="none"/>
+    <security:http pattern="/js" security="none"/>
+    <security:http pattern="../webapp/statistic.html" security="none"/>
+    <!--Oauth server start.............-->
+
+    <!--
+        Spring MVC的注解配置, 注意: 该配置不能放置在 mkk-servlet.xml 文件中
+    -->
+    <mvc:annotation-driven/>
+    <mvc:default-servlet-handler/>
+
+    <!--
+     OAuth2 URL: /oauth/token   的处理与配置
+     一般使用时这里不需要修改, 直接使用即可
+    -->
+    <security:http pattern="/oauth/*" create-session="stateless" authentication-manager-ref="oauth2AuthenticationManager"
+          entry-point-ref="oauth2AuthenticationEntryPoint" use-expressions="true">
+        <security:intercept-url pattern="/oauth/*" access="permitAll()"/>
+        <security:anonymous enabled="false"/>
+        <security:http-basic entry-point-ref="oauth2AuthenticationEntryPoint"/>
+
+        <security:custom-filter ref="clientCredentialsTokenEndpointFilter" before="BASIC_AUTH_FILTER"/>
+        <security:access-denied-handler ref="oauth2AccessDeniedHandler"/>
+        <security:csrf disabled="true"/>
+    </security:http>
+
+
+    <!--
+    处理grant_type=client_credentials 的逻辑
+    只从请求中获取client_id与client_secret
+-->
+    <bean id="clientCredentialsTokenEndpointFilter"
+                class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter">
+        <property name="allowOnlyPost" value="false"/>
+        <property name="authenticationManager" ref="oauth2AuthenticationManager"/>
+    </bean>
+    <!--
+        对具体的资源(resource)的安全配置逻辑, 包括ROLE, Scope等
+        可根据具体的需求添加, 每一类URL pattern 对应具体的resource
+        /api/**  处理资源 apiResourceServer
+    -->
+    <!--unity http configuration-->
+    <security:http pattern="/api/**" create-session="stateless" entry-point-ref="oauth2AuthenticationEntryPoint"
+          access-decision-manager-ref="oauth2AccessDecisionManager" use-expressions="true">
+        <security:anonymous enabled="false"/>
+
+        <security:intercept-url pattern="/api/**" access="isAuthenticated()" />
+        <security:custom-filter ref="apiResourceServer" before="PRE_AUTH_FILTER"/>
+        <security:access-denied-handler ref="oauth2AccessDeniedHandler"/>
+        <security:csrf disabled="true"/>
+    </security:http>
+
+    <!--
+        每一个资源(resource)的定义, resource-id必须唯一, OauthClientDetails中的resourceIds属性的值由此来的,
+        允许一个Client有多个resource-id, 由逗号(,)分隔
+        每一个定义会在Security Flow中添加一个位于 PRE_AUTH_FILTER 之前的Filter
+    -->
+    <!--unity resource server filter-->
+    <oauth2:resource-server id="apiResourceServer" resource-id="api-resource" token-services-ref="tokenServices"/>
+
+    <!--Config ClientDetailsService-->
+    <oauth2:client-details-service id="clientDetailsService">
+        <!--&lt;!&ndash;unity client&ndash;&gt;-->
+        <oauth2:client client-id="api-client" resource-ids="api-resource"
+        authorized-grant-types="client_credentials,refresh_token"
+        secret="unity" authorities="ROLE_API" scope="select"/>
+
+    </oauth2:client-details-service>
+
+    <!--Config token services-->
+    <bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore">
+        <constructor-arg index="0" ref="jedisConnectionFactory">
+        </constructor-arg>
+    </bean>
+
+    <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+        <property name="tokenStore" ref="tokenStore"/>
+        <property name="clientDetailsService" ref="clientDetailsService"/>
+        <property name="supportRefreshToken" value="true"/>
+        <property name="accessTokenValiditySeconds" value="43200"/>
+    </bean>
+
+    <bean class="org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory"
+                id="oAuth2RequestFactory">
+        <constructor-arg name="clientDetailsService" ref="clientDetailsService"/>
+    </bean>
+
+    <bean id="oauthUserApprovalHandler" class="org.springframework.security.oauth2.provider.approval.TokenStoreUserApprovalHandler">
+        <property name="tokenStore" ref="tokenStore"/>
+        <property name="clientDetailsService" ref="clientDetailsService"/>
+        <property name="requestFactory" ref="oAuth2RequestFactory"/>
+
+    </bean>
+
+    <!--
+        Security OAuth Flow的核心配置
+        每一个配置对应一类具体的grant_type
+        可根据需求删除或禁用, 如: <oauth2:implicit disabled="true"/>
+        默认支持OAuth2提供的5类grant_type, 若不需要任何一类, 将其配置注释掉(或删掉)即可.
+        若需要自定义 authorization url, 在 <oauth2:authorization-server > 配置中添加authorization-endpoint-url,如: authorization-endpoint-url="/oauth2/authorization"
+        若需要自定义 token url, 在 <oauth2:authorization-server > 配置中添加token-endpoint-url配置, 如:token-endpoint-url="/oauth2/my_token"
+    -->
+    <oauth2:authorization-server client-details-service-ref="clientDetailsService" token-services-ref="tokenServices"
+                                 user-approval-handler-ref="oauthUserApprovalHandler"
+                                 user-approval-page="oauth_approval"
+                                 error-page="oauth_error">
+        <oauth2:authorization-code disabled="true"/>
+        <oauth2:implicit disabled="true"/>
+        <oauth2:refresh-token />
+        <oauth2:client-credentials/>
+        <oauth2:password disabled="true"/>
+        <!--oauth2:custom-grant token-granter-ref="clientCredentials"/-->
+    </oauth2:authorization-server>
+
+    <!--bean id="clientCredentials" class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenGranter">
+        <constructor-arg index="0" ref="tokenServices"/>
+         <constructor-arg index="1" ref="clientDetailsService"/>
+        <constructor-arg index="2" ref="oAuth2RequestFactory"/>
+        <property name="allowRefresh" value="true"/>
+    </bean-->
+
+    <bean id="oauth2AuthenticationEntryPoint"
+                class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint"/>
+
+
+    <bean id="oauth2ClientDetailsUserService"
+                class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <constructor-arg ref="clientDetailsService"/>
+    </bean>
+
+    <security:authentication-manager id="oauth2AuthenticationManager">
+        <security:authentication-provider user-service-ref="oauth2ClientDetailsUserService"/>
+    </security:authentication-manager>
+
+    <!--
+    扩展Spring Security 默认的 AccessDecisionManager
+    添加对OAuth中 scope 的检查与校验
+-->
+    <bean id="oauth2AccessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased">
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.web.access.expression.WebExpressionVoter"/>
+                <bean class="org.springframework.security.oauth2.provider.vote.ScopeVoter"/>
+                <bean class="org.springframework.security.access.vote.RoleVoter"/>
+                <bean class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="oauth2AccessDeniedHandler"
+                class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler"/>
+
+    <!--Oauth server end.............-->
+
+    <security:http use-expressions="true" authentication-manager-ref="authenticationManager" disable-url-rewriting="true">
+        <security:form-login
+                login-page="/admin/login"
+                authentication-failure-url="/admin/login?error=true"
+                login-processing-url="/login_check"
+                always-use-default-target="true"
+                default-target-url="/admin/index"
+                authentication-success-handler-ref="myAuthenticationSuccessHandler"/>
+        <!-- 认证成功用自定义类myAuthenticationSuccessHandler处理 -->
+
+        <security:logout logout-url="/admin/logout"
+                         logout-success-url="/admin/login"
+                         invalidate-session="true"
+                         delete-cookies="JSESSIONID"/>
+
+        <security:csrf disabled="true"/>
+        <security:intercept-url pattern="/admin/**" access="isAuthenticated()"/>
+    </security:http>
+
+    <security:authentication-manager id="authenticationManager">
+        <security:authentication-provider user-service-ref="myUserDetailsService">
+            <!-- 加密 -->
+            <security:password-encoder hash="plaintext">
+            </security:password-encoder>
+        </security:authentication-provider>
+    </security:authentication-manager>
+</beans>

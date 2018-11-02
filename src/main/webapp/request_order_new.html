@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>热速达</title>
+    <link rel="stylesheet" href="css/weui.css"/>
+    <link rel="stylesheet" href="css/weui2.css"/>
+    <link rel="stylesheet" href="css/weui3.css"/>
+    <link rel="stylesheet" href="css/order.css"/>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/php.js"></script>
+    <script src="js/example.js"></script>
+    <script src="js/picker.js"></script>
+</head>
+<body ontouchstart style="background-color: #f8f8f8;">
+<div class="page-bd">
+    <form id="form">
+    <div class="weui_cells_title">订单</div>
+    <div class="weui_cells weui_cells_form">
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">预计时间</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" id="deliveryDate" name="deliveryDate" required type="text" />
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">送货地址</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="text" id="address" name="address" required placeholder="请输入送货地址"/>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">联系电话</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="number" id="phone" name="phone" required pattern="[0-11]*" placeholder="请输入联系电话"/>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">购买数量</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <a class="weui-number weui-number-sub needsclick">-</a>
+                <input id="times" type="number" name="times" required pattern="[0-9]*" style="width:50px;" readonly class="weui-number-input" value='1'  data-min="1" data-max="30" data-step="1">
+                <a class="weui-number weui-number-plus needsclick">+</a>
+
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">预计价格</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="number" value="425" name="price" id="price" readonly/>
+            </div>
+            <div class="weui_cell_bd">
+                <label class="weui_label">(元)</label>
+            </div>
+        </div>
+    </div>
+    <!--
+    <div class="weui_cells_title">热量</div>
+    <div class="weui_cells">
+        <div class="weui_cell weui_cell_select weui_select_after">
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="number" pattern="[0-9]*" onchange="calculatePrice();" id="quantity" name="quantity" required placeholder="请输入数量"/>
+            </div>
+            <div class="weui_cell_hd">
+                <select class="weui_select" name="quantityUnit" onchange="calculatePrice();" id="quantityUnit">
+                    <option value="1">GJ</option>
+                    <option value="2">千瓦时</option>
+                </select>
+            </div>
+        </div>
+    </div>-->
+    <div class="weui_cells_title">备注</div>
+    <div class="weui_cells">
+        <div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" placeholder="请输入备注" maxlength="100" id="comment" name="comment" type="text">
+            </div>
+        </div>
+    </div>
+    </form>
+    <div class="weui_btn_area">
+        <a class="weui_btn weui_btn_primary" href="javascript:" id="formSubmitBtn">提交订单</a>
+    </div>
+    </form>
+</div>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+
+    function upDownOperation(element)
+    {
+        var _input = element.parent().find('input'),
+                _value = _input.val(),
+                _step = _input.attr('data-step') || 1;
+        //检测当前操作的元素是否有disabled，有则去除
+        element.hasClass('disabled') && element.removeClass('disabled');
+        //检测当前操作的元素是否是操作的添加按钮（.input-num-up）‘是’ 则为加操作，‘否’ 则为减操作
+        if ( element.hasClass('weui-number-plus') )
+        {
+            var _new_value = parseInt( parseFloat(_value) + parseFloat(_step) ),
+                    _max = _input.attr('data-max') || false,
+                    _down = element.parent().find('.weui-number-sub');
+
+            //若执行‘加’操作且‘减’按钮存在class='disabled'的话，则移除‘减’操作按钮的class 'disabled'
+            _down.hasClass('disabled') && _down.removeClass('disabled');
+            if (_max && _new_value >= _max) {
+                _new_value = _max;
+                element.addClass('disabled');
+            }
+        } else {
+            var _new_value = parseInt( parseFloat(_value) - parseFloat(_step) ),
+                    _min = _input.attr('data-min') || false,
+                    _up = element.parent().find('.weui-number-plus');
+            //若执行‘减’操作且‘加’按钮存在class='disabled'的话，则移除‘加’操作按钮的class 'disabled'
+            _up.hasClass('disabled') && _up.removeClass('disabled');
+            if (_min && _new_value <= _min) {
+                _new_value = _min;
+                element.addClass('disabled');
+            }
+        }
+        _input.val( _new_value );
+    }
+
+    $(function(){
+        $('.weui-number-plus').click(function(){
+            upDownOperation( $(this) );
+        });
+        $('.weui-number-sub').click(function(){
+            upDownOperation( $(this) );
+        });
+        $.getJSON("user",function(data){
+            $("#address").val(data.data.user.address);
+            $("#phone").val(data.data.user.phone);
+
+            if(data.data.user.role != 4){
+                top.location = "order_warn.html";
+            }
+        });
+
+        $("#deliveryDate").datetimePicker({title:"选择日期时间",min:date("Y-m-d"),max:'2050-10-01'});
+        var $form = $("#form");
+        $form.form();
+        $("#formSubmitBtn").on("click", function(){
+            $.showLoading("提交中...");
+            $form.validate(function(error){
+
+                if(error){
+                    $.hideLoading();
+                }else{
+                    $.post("order/save",
+                            {
+                                quantity:$("#quantity").val(),
+                                quantityUnit:$("#quantityUnit").val(),
+                                deliveryDate:fdate(),
+                                price:$("#price").val(),
+                                address:$("#address").val(),
+                                phone:$("#phone").val(),
+                                comment:$("#comment").val(),
+                                times:$("#times").val()
+                            },
+                            function(data){
+                                $.hideLoading();
+                                if(data.code == "200"){
+                                    top.location = "order_msg.html"
+                                }else{
+                                    $.toptips(data.msg);
+                                }
+                            },"json");
+                }
+            });
+        });
+    });
+
+    var now = new Date();
+    now.setHours(now.getHours() + 2);
+    now.setMinutes(now.getMinutes() + 5);
+    var str = now.getFullYear() + "-" + fix((now.getMonth() + 1), 2) + "-" + fix(now.getDate(), 2) + " " + fix(now.getHours(), 2) + ":" + fix(now.getMinutes(), 2);
+    $("#deliveryDate").val(str);
+
+    function getIntervalHour(startDate, endDate) {
+        var ms = endDate.getTime() - startDate.getTime();
+        if (ms < 0) return 0;
+        return Math.floor(ms/1000/60/60);
+    }
+
+    //将日期格式化为两位，不足补零
+    function fix(num, length) {
+        return ('' + num).length < length ? ((new Array(length + 1)).join('0') + num).slice(-length) : '' + num;
+    }
+    function fdate() {
+        //将datetime-local转换为Date
+        var x = $("#deliveryDate").val();
+
+        return (x+":00").replace("T"," ");
+    }
+    function calculatePrice() {
+        if($("#quantityUnit").val() == 1){
+            $("#price").val(accMul($("#quantity").val(),85).toFixed(2));
+        }else{
+            $("#price").val(accMul(accDiv($("#quantity").val(),278),85).toFixed(2));
+        }
+    }
+</script>
+</body>
+</html>
