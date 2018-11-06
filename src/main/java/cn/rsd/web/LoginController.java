@@ -116,10 +116,10 @@ public class LoginController {
 
         Users user = (Users)request.getSession().getAttribute("user");
         String openId = user.getOpenId();
-
+/**退出先不把openid,变空.
         user.setOpenId(" ");
         this.usersMapper.updateByPrimaryKey(user);
-
+*/
         request.getSession().removeAttribute("user");
         request.getSession().invalidate();
 
