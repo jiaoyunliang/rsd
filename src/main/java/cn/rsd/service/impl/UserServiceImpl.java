@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService, UserDetailsService,ClientDe
             users.setState(1);
             returnVal = this.userMapper.insertUseGeneratedKeys(users);
         }else{
-            returnVal = this.userMapper.updateByPrimaryKey(users);
+            returnVal = this.userMapper.updateByPrimaryKeySelective(users);
         }
 
         //暂时同一用户只能属于一个供应点.
