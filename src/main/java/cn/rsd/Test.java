@@ -1,6 +1,5 @@
 package cn.rsd;
 
-import cn.rsd.po.BuyerOrder;
 import cn.rsd.util.DataConverter;
 
 import java.io.FileInputStream;
@@ -18,10 +17,11 @@ import java.util.Date;
  */
 public class Test {
     public static void main(String[] args) {
-        BuyerOrder buyerOrder = new BuyerOrder();
-        buyerOrder.setState(6);
-        System.out.println(BuyerOrder.BuyerOrderStateEnum.UNPAID.ordinal());
-      System.out.println(  buyerOrder.getState() == BuyerOrder.BuyerOrderStateEnum.UNPAID.ordinal());
+       System.out.println(DataConverter.toBinary(2>>1,8));
+        System.out.println(DataConverter.toBinary(8,8));
+
+        System.out.println(8>>3 == 1);
+        System.out.println(2>>1 == 1);
     }
 
     /**

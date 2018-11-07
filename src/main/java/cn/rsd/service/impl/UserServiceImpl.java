@@ -95,11 +95,11 @@ public class UserServiceImpl implements UserService, UserDetailsService,ClientDe
 
         //暂时同一用户只能属于一个供应点.
         SupplyPostUser supplyPostUser = new SupplyPostUser();
-        //supplyPostUser.setSupplyId(supplyPostId);
         supplyPostUser.setUserId(users.getId());
 
         this.supplyPostsMapper.delSupplyUser(supplyPostUser);
 
+        supplyPostUser.setSupplyId(supplyPostId);
         this.supplyPostsMapper.insertSupplyUser(supplyPostUser);
 
         return returnVal;

@@ -29,6 +29,21 @@ public class Users extends BasePo implements UserDetails {
     private String appId;
     private String addressPic;
 
+
+    @Transient
+    private Double balance;
+
+    @Transient
+    private Long supplyPostId;
+
+    public Long getSupplyPostId() {
+        return supplyPostId;
+    }
+
+    public void setSupplyPostId(Long supplyPostId) {
+        this.supplyPostId = supplyPostId;
+    }
+
     public String getAddressPic() {
         return addressPic;
     }
@@ -36,8 +51,7 @@ public class Users extends BasePo implements UserDetails {
     public void setAddressPic(String addressPic) {
         this.addressPic = addressPic;
     }
-    @Transient
-    private Double balance;
+
 
     public String getAppId() {
         return appId;
