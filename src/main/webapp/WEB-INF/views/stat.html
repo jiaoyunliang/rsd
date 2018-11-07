@@ -1,0 +1,181 @@
+<!doctype html>
+<html class="no-js fixed-layout" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{stat_layout/layout}">
+<head th:include="layout/layout :: htmlhead" th:with="title='统计'">
+    <meta charset="utf-8">
+    <title></title>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="container-fluid am-cf">
+        <div class="row  am-cf">
+            <div id="c1" style="display:inline;float:left;"></div>
+            <div id="c2" style="display:inline;float:left;"></div>
+            <div id="c3" style="display:inline;float:left;"></div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
+<script type="text/javascript">
+    $(function () {
+        //const { Global } = G2; // 获取 Global 全局对象
+        //Global.setTheme('dark'); // 传入值为 'default'、'dark' 的一种，如果不是，那么使用 default 主题。
+        const { Global } = G2; // 获取 Global 全局对象
+        Global.setTheme('dark');
+        const theme = G2.Util.deepMix({
+            tooltip:{
+                ['g2-tooltip']: {
+                    color: '#333'
+                }
+            }
+        }, G2.Theme);
+
+        G2.Global.setTheme(theme); // 将主题设置为用户自定义的主题
+
+        const data = [
+            { genre: 'Sports', sold: 275 },
+            { genre: 'Strategy', sold: 115 },
+            { genre: 'Action', sold: 120 },
+            { genre: 'Shooter', sold: 350 },
+            { genre: 'Other', sold: 150 }
+        ]; // G2 对数据源格式的要求，仅仅是 JSON 数组，数组的每个元素是一个标准 JSON 对象。
+// Step 1: 创建 Chart 对象
+        const chart = new G2.Chart({
+            container: 'c1'
+        });
+// Step 2: 载入数据源
+        chart.source(data);
+// Step 3：创建图形语法，绘制柱状图，由 genre 和 sold 两个属性决定图形位置，genre 映射至 x 轴，sold 映射至 y 轴
+        chart.interval().position('genre*sold').color('genre')
+// Step 4: 渲染图表
+        chart.render();
+
+
+        var data1 = [{
+            year: '2007',
+            population: 33
+        }, {
+            year: '2008',
+            population: 46
+        }, {
+            year: '2009',
+            population: 38.3
+        }, {
+            year: '2010',
+            population: 28
+        }, {
+            year: '2011',
+            population: 42.5
+        }, {
+            year: '2012',
+            population: 30.3
+        }];
+
+        var chart1 = new G2.Chart({
+            container: 'c2'
+        });
+        chart1.source(data1);
+        chart1.coord('polar', {
+            innerRadius: 0.2
+        });
+        chart1.legend({
+            position: 'right',
+            offsetY: -window.innerHeight / 2 + 180,
+            offsetX: -140
+        });
+        chart1.axis(false);
+        chart1.interval().position('year*population').color('year', G2.Global.colors_pie_16).style({
+            lineWidth: 1,
+            stroke: '#fff'
+        });
+        chart1.render();
+
+
+        var data2 = [{
+            month: 'Jan',
+            Tokyo: 7.0,
+            London: 3.9
+        }, {
+            month: 'Feb',
+            Tokyo: 6.9,
+            London: 4.2
+        }, {
+            month: 'Mar',
+            Tokyo: 9.5,
+            London: 5.7
+        }, {
+            month: 'Apr',
+            Tokyo: 14.5,
+            London: 8.5
+        }, {
+            month: 'May',
+            Tokyo: 18.4,
+            London: 11.9
+        }, {
+            month: 'Jun',
+            Tokyo: 21.5,
+            London: 15.2
+        }, {
+            month: 'Jul',
+            Tokyo: 25.2,
+            London: 17.0
+        }, {
+            month: 'Aug',
+            Tokyo: 26.5,
+            London: 16.6
+        }, {
+            month: 'Sep',
+            Tokyo: 23.3,
+            London: 14.2
+        }, {
+            month: 'Oct',
+            Tokyo: 18.3,
+            London: 10.3
+        }, {
+            month: 'Nov',
+            Tokyo: 13.9,
+            London: 6.6
+        }, {
+            month: 'Dec',
+            Tokyo: 9.6,
+            London: 4.8
+        }];
+        var ds = new DataSet();
+        var dv = ds.createView().source(data2);
+// fold 方式完成了行列转换，如果不想使用 DataSet 直接手工转换数据即可
+        dv.transform({
+            type: 'fold',
+            fields: ['Tokyo', 'London'], // 展开字段集
+            key: 'city', // key字段
+            value: 'temperature' // value字段
+        });
+        var chart2 = new G2.Chart({
+            container: 'c3'
+        });
+        chart2.source(dv, {
+            month: {
+                range: [0, 1]
+            }
+        });
+        chart2.tooltip({
+            crosshairs: {
+                type: 'line'
+            }
+        });
+        chart2.axis('temperature', {
+            label: {
+                formatter: function formatter(val) {
+                    return val + '°C';
+                }
+            }
+        });
+        chart2.line().position('month*temperature').color('city').shape('smooth');
+        chart2.point().position('month*temperature').color('city').size(4).shape('circle').style({
+            stroke: '#fff',
+            lineWidth: 1
+        });
+        chart2.render();
+    });
+</script>

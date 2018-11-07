@@ -99,7 +99,7 @@
                   <!-- more data -->
                   <tr th:each="meter,stat1 : ${meterData}" class="even gradeC odd" role="row">
                     <td class="sorting_1" th:text="${meter.dataStr}"></td>
-                    <td th:text="${#dates.format(meter.reportDate,'yyyy-MM-dd hh:mm:ss')}"></td>
+                    <td th:text="${#dates.format(meter.reportDate,'yyyy-MM-dd HH:mm:ss')}"></td>
                   </tr></tbody>
                 </table></div>
               </div>

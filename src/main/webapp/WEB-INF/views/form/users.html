@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
-<div class="am-popup" id="my-popup" data->
+<div class="am-popup" id="my-popup">
     <div class="am-popup-inner">
         <div class="am-popup-hd">
             <h4 class="am-popup-title">编辑窗口</h4>
@@ -50,9 +50,9 @@
                             </div>
                         </div>
                         <div class="am-form-group">
-                            <label for="roles" class="am-u-sm-3 am-form-label">类型: </label>
+                            <label for="role" class="am-u-sm-3 am-form-label">类型: </label>
                             <div class="am-u-sm-9">
-                                <select data-am-selected id="roles" name="roles" required>
+                                <select data-am-selected id="role" name="role" required>
                                     <option th:each="role,stat1 : ${roles}" th:value="${role.id}" th:text="${role.roleName}"></option>
                                 </select>
                             </div>
@@ -64,6 +64,20 @@
                                     <option value="-1">无</option>
                                     <option th:each="supplyPost,stat1 : ${supplyPosts}" th:value="${supplyPost.id}" th:text="${supplyPost.supplyName}"></option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="addressPic" class="am-u-sm-3 am-form-label">地址图片: </label>
+                            <div class="am-u-sm-9">
+                                <input type="hidden" name="addressPic"/>
+                                <div class="am-form-group am-form-file" id="drag-and-drop-zone">
+                                    <div class="tpl-form-file-img" style="height:150px;width:150px;">
+                                        <img id="addressPicImg" th:src="@{../../images/noimage.jpg}" alt="..." width="100%" height="100%"/>
+                                    </div>
+                                    <button type="button" class="am-btn am-btn-danger am-btn-sm">
+                                        <i class="am-icon-cloud-upload"></i> 添加地址图片</button>
+                                    <input id="addressPic" type="file" multiple="">
+                                </div>
                             </div>
                         </div>
                         <div class="am-form-group">
@@ -80,6 +94,70 @@
 <script type="text/javascript">
     var _ctx = $("meta[name='ctx']").attr("content");
     $(function() {
+
+        $('#my-popup').on('open.modal.amui', function() {
+
+            $('#drag-and-drop-zone').dmUploader({
+                url: _ctx + '/admin/user/fileUploadPicture',
+                maxFileSize: 3000000, // 3 Megs max
+                multiple: false,
+                dnd:false,
+                dataType:'json',
+                fieldName:'addressPicFile',
+                allowedTypes: 'image/*',
+                extFilter: ['jpg','jpeg','png','gif'],
+                onDragEnter: function(){
+                    // Happens when dragging something over the DnD area
+                    this.addClass('active');
+                },
+                onDragLeave: function(){
+                    // Happens when dragging something OUT of the DnD area
+                    this.removeClass('active');
+                },
+                onInit: function(){
+
+                },
+                onComplete: function(){
+
+                },
+                onNewFile: function(id, file){
+                    if (typeof FileReader !== "undefined"){
+                        var reader = new FileReader();
+                        var img = this.find('img');
+
+                        reader.onload = function (e) {
+                            img.attr('src', e.target.result);
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                },
+                onBeforeUpload: function(id){
+
+                },
+                onUploadProgress: function(id, percent){
+
+                },
+                onUploadSuccess: function(id, data){
+                    $("input[name='addressPic']").val(data.data.path);
+                    console.log(data.data.path);
+                },
+                onUploadError: function(id, xhr, status, message){
+
+                },
+                onFallbackMode: function(){
+
+                },
+                onFileSizeError: function(file){
+
+                },
+                onFileTypeError: function(file){
+
+                },
+                onFileExtError: function(file){
+
+                }
+            });
+        });
         $('#my-popup').on('closed.modal.amui', function() {
             $(this).removeData('amui.modal');
             $("#frm-employee")[0].reset();
@@ -91,6 +169,8 @@
             $("#frm-employee select").find('option').eq(0).attr('selected', true);
             $("#frm-employee select").trigger('changed.selected.amui');
             $("#frm-employee").find(".am-alert").hide();
+            //销毁上传组件
+            $("#rag-and-drop-zone").dmUploader("destroy");
             search();
         });
 
@@ -140,6 +220,10 @@
 
     function fillFrm(data,frmId) {
         $("#my-popup").modal('open');
+
+        if(data.addressPic){
+            $("#addressPicImg").src(data.addressPic);
+        }
 
         var key,value,tagName,type,arr;
         for(x in data){
