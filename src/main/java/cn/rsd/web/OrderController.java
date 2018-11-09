@@ -240,7 +240,7 @@ public class OrderController {
 
     @RequestMapping(value="/weixin",method = RequestMethod.POST)
     @ResponseBody
-    public ReturnMessage weixin(Long id,HttpServletRequest request) throws Exception{
+    public ReturnMessage weixin(Long id,Integer fee,HttpServletRequest request) throws Exception{
         ReturnMessage message = ReturnMessage.buildMessage();
 
 
@@ -250,6 +250,9 @@ public class OrderController {
             throw new Exception("无效订单!");
         }
 
+        if(!buyerOrder.getPrice().equals(fee)){
+            throw new Exception("金额异常!");
+        }
         SortedMap<Object,Object> signMap = new TreeMap<>();
         try {
             WXPay wxPay = new WXPay(myWXPayConfig, false, false);
