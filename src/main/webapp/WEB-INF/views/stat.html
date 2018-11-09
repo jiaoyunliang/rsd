@@ -1,31 +1,132 @@
 <!doctype html>
-<html class="no-js fixed-layout" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{stat_layout/layout}">
-<head th:include="layout/layout :: htmlhead" th:with="title='统计'">
+<html class="no-js fixed-layout" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{stat_layout/layout}">
+        <head th:include="stat_layout/layout :: htmlhead" th:with="title='统计'">
     <meta charset="utf-8">
     <title></title>
 </head>
 <body>
-
 <th:block layout:fragment="content">
-    <div class="container-fluid am-cf">
-        <div class="row  am-cf">
-            <div id="c1" style="display:inline;float:left;"></div>
-            <div id="c2" style="display:inline;float:left;"></div>
-            <div id="c3" style="display:inline;float:left;"></div>
+    <div class="am-g doc-am-g row">
+        <div class="am-u-lg-4">
+            <div class="am-g" style="height:380px;">
+                <div class="am-u-lg-12 am-center am-padding-xl">
+                    <div class="am-fl">
+                        <a href="javascript:;"><img src="/img/log111o.png" alt=""></a>
+                    </div>
+                    <div class="am-text-xxxl">好好学习天天向上有限公司</div>
+                </div>
+            </div>
+            <div class="am-g" style="height:100px;">
+                <div class="am-u-lg-12 am-center am-padding-xl">
+                    <p id="allHeatSum" class="am-text-xxxl am-lg-text-center" th:text="'总热量:'+${heatSum}+'MWH'"></p>
+                </div>
+            </div>
+            <div class="am-g" style="height:680px;">
+                <div class="am-u-lg-12 am-center am-padding-xl">
+                    <div id="c1" class="am-margin"></div>
+                </div>
+            </div>
+        </div>
+        <div class="am-u-lg-4">
+            <div class="am-g" style="height:580px;">
+                <div class="am-u-lg-6 am-center am-padding-xl">
+                    <p class="am-text-xxxl" id="user1"></p>
+                    <div id="c2" class="am-margin"></div>
+                </div>
+                <div class="am-u-lg-6 am-center am-padding-xl">
+                    <p class="am-text-xxxl" id="user2"></p>
+                    <div id="c3" class="am-margin"></div>
+                </div>
+            </div>
+            <div class="am-g" style="height:580px;">
+                <div class="am-u-lg-12 am-center am-padding-xl">
+                    <p class="am-text-xxxl">减少碳排放量</p>
+                    <div id="c4" class="am-margin"></div>
+                </div>
+            </div>
+        </div>
+        <div class="am-u-lg-4">
+            <div class="am-g" style="height:580px;">
+                <div class="am-u-lg-12 am-center am-padding-xl">
+                    <p class="am-text-xxxl">司机路线</p>
+                    <table class="am-table am-table-compact am-text-nowrap tpl-table-black  dataTable no-footer"
+                           role="grid" style="width: 98%;" width="98%" id="driver_table">
+                        <thead>
+                        <tr role="row">
+                            <th>车牌</th>
+                            <th>司机</th>
+                            <th>状态</th>
+                            <th>路线</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="am-g" style="height:580px;">
+                <div class="am-u-lg-12 am-center am-padding-xl">
+                    <p class="am-text-xxxl">个人总费用</p>
+                    <table class="am-table am-table-compact am-text-nowrap tpl-table-black  dataTable no-footer"
+                           id="free_table" role="grid" style="width:98%;" width="98%">
+                        <thead>
+                        <tr role="row">
+                            <th>用户名称</th>
+                            <th>当前费用</th>
+                            <th>总费用</th>
+                            <th>交易时间</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </th:block>
 </body>
 </html>
+<script id="driver" type="text/html">
+    <tbody>
+    #{for(var i = 0; i < drivers.length; i++) {}#
+    <tr>
+        <td>#{:=drivers[i].driverName}#</td>
+        <td>#{:=drivers[i].plateNumber}#</td>
+        <td>#{:=drivers[i].state}#</td>
+        <td>#{:=drivers[i].route}#</td>
+    </tr>
+    #{}}#
+    </tbody>
+</script>
+<script id="free" type="text/html">
+    <tbody>
+    #{for(var i = 0; i < free.length; i++) {}#
+    <tr>
+        <td>#{:=free[i].company}#</td>
+        <td>#{:=free[i].price}#元</td>
+        <td>#{:=free[i].allPrice}#元</td>
+        <td>#{:=free[i].updateDate}#</td>
+    </tr>
+    #{}}#
+    </tbody>
+</script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    var users = [[${users}]];
+
+    /*]]>*/
+</script>
 <script type="text/javascript">
+    var _ctx = $("meta[name='ctx']").attr("content");
+
+    if (!_ctx) {
+        _ctx = "";
+    }
     $(function () {
         //const { Global } = G2; // 获取 Global 全局对象
         //Global.setTheme('dark'); // 传入值为 'default'、'dark' 的一种，如果不是，那么使用 default 主题。
-        const { Global } = G2; // 获取 Global 全局对象
+        const {Global} = G2; // 获取 Global 全局对象
         Global.setTheme('dark');
         const theme = G2.Util.deepMix({
-            tooltip:{
+            tooltip: {
                 ['g2-tooltip']: {
                     color: '#333'
                 }
@@ -34,148 +135,196 @@
 
         G2.Global.setTheme(theme); // 将主题设置为用户自定义的主题
 
-        const data = [
-            { genre: 'Sports', sold: 275 },
-            { genre: 'Strategy', sold: 115 },
-            { genre: 'Action', sold: 120 },
-            { genre: 'Shooter', sold: 350 },
-            { genre: 'Other', sold: 150 }
-        ]; // G2 对数据源格式的要求，仅仅是 JSON 数组，数组的每个元素是一个标准 JSON 对象。
-// Step 1: 创建 Chart 对象
-        const chart = new G2.Chart({
-            container: 'c1'
+        var data = [];
+
+        var chart = new G2.Chart({
+            container: 'c1',
+            forceFit: true,
+            padding: 50,
+            height: 500
         });
-// Step 2: 载入数据源
         chart.source(data);
-// Step 3：创建图形语法，绘制柱状图，由 genre 和 sold 两个属性决定图形位置，genre 映射至 x 轴，sold 映射至 y 轴
-        chart.interval().position('genre*sold').color('genre')
-// Step 4: 渲染图表
-        chart.render();
-
-
-        var data1 = [{
-            year: '2007',
-            population: 33
-        }, {
-            year: '2008',
-            population: 46
-        }, {
-            year: '2009',
-            population: 38.3
-        }, {
-            year: '2010',
-            population: 28
-        }, {
-            year: '2011',
-            population: 42.5
-        }, {
-            year: '2012',
-            population: 30.3
-        }];
-
-        var chart1 = new G2.Chart({
-            container: 'c2'
+        chart.scale('time', {
+            range: [0, 1]
         });
-        chart1.source(data1);
-        chart1.coord('polar', {
-            innerRadius: 0.2
-        });
-        chart1.legend({
-            position: 'right',
-            offsetY: -window.innerHeight / 2 + 180,
-            offsetX: -140
-        });
-        chart1.axis(false);
-        chart1.interval().position('year*population').color('year', G2.Global.colors_pie_16).style({
-            lineWidth: 1,
-            stroke: '#fff'
-        });
-        chart1.render();
-
-
-        var data2 = [{
-            month: 'Jan',
-            Tokyo: 7.0,
-            London: 3.9
-        }, {
-            month: 'Feb',
-            Tokyo: 6.9,
-            London: 4.2
-        }, {
-            month: 'Mar',
-            Tokyo: 9.5,
-            London: 5.7
-        }, {
-            month: 'Apr',
-            Tokyo: 14.5,
-            London: 8.5
-        }, {
-            month: 'May',
-            Tokyo: 18.4,
-            London: 11.9
-        }, {
-            month: 'Jun',
-            Tokyo: 21.5,
-            London: 15.2
-        }, {
-            month: 'Jul',
-            Tokyo: 25.2,
-            London: 17.0
-        }, {
-            month: 'Aug',
-            Tokyo: 26.5,
-            London: 16.6
-        }, {
-            month: 'Sep',
-            Tokyo: 23.3,
-            London: 14.2
-        }, {
-            month: 'Oct',
-            Tokyo: 18.3,
-            London: 10.3
-        }, {
-            month: 'Nov',
-            Tokyo: 13.9,
-            London: 6.6
-        }, {
-            month: 'Dec',
-            Tokyo: 9.6,
-            London: 4.8
-        }];
-        var ds = new DataSet();
-        var dv = ds.createView().source(data2);
-// fold 方式完成了行列转换，如果不想使用 DataSet 直接手工转换数据即可
-        dv.transform({
-            type: 'fold',
-            fields: ['Tokyo', 'London'], // 展开字段集
-            key: 'city', // key字段
-            value: 'temperature' // value字段
-        });
-        var chart2 = new G2.Chart({
-            container: 'c3'
-        });
-        chart2.source(dv, {
-            month: {
-                range: [0, 1]
+        chart.tooltip({
+            crosshairs: {
+                type: 'line'
             }
         });
+        chart.axis('heat', {
+            label: {
+                formatter: function formatter(val) {
+                    return val + 'MWH';
+                }
+            }
+        });
+        chart.legend('heat', {title: "热量"});
+        chart.areaStack().position('time*heat').shape('smooth');
+        chart.lineStack().position('time*heat').shape('smooth').size(2);
+        chart.render();
+
+        var data1 = [];
+
+        var chart1 = new G2.Chart({
+            container: 'c2',
+            forceFit: true,
+            padding: 50,
+            height: 500
+        });
+        chart1.source(data1);
+        chart1.tooltip({
+            crosshairs: {
+                type: 'line'
+            }
+        });
+
+        chart1.legend('heat', {title: "热量"});
+        chart1.areaStack().position('time*heat').shape('smooth');
+        chart1.lineStack().position('time*heat').shape('smooth').size(2);
+        chart1.render();
+
+        var data2 = [];
+
+        var chart2 = new G2.Chart({
+            container: 'c3',
+            forceFit: true,
+            padding: 50,
+            height: 500
+        });
+        chart2.source(data2);
         chart2.tooltip({
             crosshairs: {
                 type: 'line'
             }
         });
-        chart2.axis('temperature', {
+
+        chart2.legend('heat', {title: "热量"});
+        chart2.areaStack().position('time*heat').shape('smooth');
+        chart2.lineStack().position('time*heat').shape('smooth').size(2);
+        chart2.render();
+
+        var data3 = [];
+
+        var chart3 = new G2.Chart({
+            container: 'c4',
+            padding: 50,
+            forceFit: true,
+            height: 500
+        });
+        chart3.source(data3);
+        chart3.tooltip({
+            crosshairs: {
+                type: 'line'
+            }
+        });
+        chart3.axis('heat', {
             label: {
                 formatter: function formatter(val) {
-                    return val + '°C';
+                    return val;
                 }
             }
         });
-        chart2.line().position('month*temperature').color('city').shape('smooth');
-        chart2.point().position('month*temperature').color('city').size(4).shape('circle').style({
-            stroke: '#fff',
-            lineWidth: 1
-        });
-        chart2.render();
+        chart3.legend('heat', {title: "减少碳排放量"});
+        chart3.areaStack().position('time*heat').shape('smooth');
+        chart3.lineStack().position('time*heat').shape('smooth').size(2);
+        chart3.render();
+
+        heatLine();
+        setInterval(function () {
+            heatLine();
+        }, 5000);
+
+        co2Line();
+        setInterval(function () {
+            co2Line();
+        }, 5000);
+
+        userLine();
+        setInterval(function () {
+            userLine();
+        }, 5000);
+
+        userTable();
+        setInterval(function () {
+            userTable();
+        }, 5000);
+
+
+        function heatLine(){
+            $.getJSON(_ctx + '/admin/stat/heat/all', function (data) {
+                $("#allHeatSum").html('总热量:'+data+'MWH');
+            });
+            //动态执行数据
+            $.getJSON(_ctx + '/admin/stat/heat/line', function (data) {
+                chart.changeData(data, {
+                    time: {
+                        type: 'linear',
+                        tickInterval: 50
+                    }
+                });
+            });
+        }
+
+        function co2Line() {
+            //动态执行数据
+            $.getJSON(_ctx + '/admin/stat/co2/line', function (data) {
+                chart3.changeData(data, {
+                    time: {
+                        type: 'linear',
+                        tickInterval: 50
+                    }
+                });
+            });
+        }
+
+        function userLine() {
+            var firstItem  = users.shift();
+            if(firstItem) {
+                $("#user1").html(firstItem.company);
+                //动态执行数据
+                $.getJSON(_ctx + '/admin/stat/user/heat/line', {userId: firstItem.id}, function (data) {
+                    chart1.changeData(data, {
+                        time: {
+                            type: 'linear',
+                            tickInterval: 50
+                        }
+                    });
+                });
+            }
+
+            var secondItem  = users.shift();
+            if(secondItem){
+                $("#user2").html(secondItem.company);
+                //动态执行数据
+                $.getJSON(_ctx + '/admin/stat/user/heat/line',{userId:secondItem.id}, function (data) {
+                    chart2.changeData(data, {
+                        time: {
+                            type: 'linear',
+                            tickInterval: 50
+                        }
+                    });
+                });
+            }
+            users.push(firstItem,secondItem);
+        }
+
+        function userTable() {
+            //动态执行数据
+            $.getJSON(_ctx + '/admin/stat/driver', function (data) {
+                template.config({sTag:"#{",eTag:"}#",compress: true});
+                var tpl = document.getElementById('driver').innerHTML;
+                $('#driver_table tbody').remove();
+                $('#driver_table').append(template(tpl,{'drivers':data}));
+            });
+            //动态执行数据
+            $.getJSON(_ctx + '/admin/stat/free', function (data) {
+                template.config({sTag:"#{",eTag:"}#",compress: true});
+                var tpl = document.getElementById('free').innerHTML;
+                $('#free_table tbody').remove();
+                $('#free_table').append(template(tpl,{'free':data}));
+            });
+        }
     });
+
 </script>

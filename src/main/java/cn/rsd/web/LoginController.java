@@ -61,6 +61,9 @@ public class LoginController {
         }else{
 
             if(openid != null){
+                //一个openid只能绑定一个用户,这里删除掉该ID绑定的用户.
+                this.usersMapper.updateUserOpendIdIsNull(openid);
+
                 user.setOpenId(openid);
                 user.setAppId(this.appId);
                 this.usersMapper.updateByPrimaryKey(user);

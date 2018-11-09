@@ -53,6 +53,16 @@ public class BuyerOrder extends BasePo {
     private String transactionId;
     private Integer starLevel;
 
+    private Long trucks;
+
+    public Long getTrucks() {
+        return trucks;
+    }
+
+    public void setTrucks(Long trucks) {
+        this.trucks = trucks;
+    }
+
     public Integer getStarLevel() {
         return starLevel;
     }

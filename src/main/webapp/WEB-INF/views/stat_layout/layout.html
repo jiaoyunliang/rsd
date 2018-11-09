@@ -16,14 +16,16 @@
     <link rel="stylesheet" href="../css/amazeui.min.css" th:href="@{/css/amazeui.min.css}"/>
     <link rel="stylesheet" href="../css/app.css" th:href="@{/css/app.css}"/>
     <script src="../js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+    <script src="../js/template.js" th:src="@{/js/template.js}"></script>
+    <script src="../js/example.js" th:src="@{/js/example.js}"></script>
 </head>
-<body class="theme-black" data-type="index">
+<body class="theme-black" style="background-color:#0D0D0D" data-type="index">
 <!--[if lte IE 9]>
 <p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
     以获得更好的体验！</p>
 <![endif]-->
 <!-- content start -->
-<div class="am-g tpl-g" style="width:4800px;height:1200px;">
+<div class="am-g tpl-g tpl-header-navbar" style="width:4800px;height:1200px;">
     <div layout:fragment="content"></div>
 </div>
 <!-- content end -->

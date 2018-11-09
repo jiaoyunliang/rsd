@@ -93,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
 
         buyerOrder.setUpdateDate(new Date());
         buyerOrder.setState(2);
-
+        buyerOrder.setTrucks(truck.getId());
         this.buyerOrderMapper.updateByPrimaryKeySelective(buyerOrder);
 
         if(driver != null && driver.getOpenId() != null){
@@ -170,6 +170,7 @@ public class OrderServiceImpl implements OrderService {
         buyerOrder.setDistribution(truck.getUserId());
         buyerOrder.setOrderCode(orderCodeService.nextId());
         buyerOrder.setState(2);
+        buyerOrder.setTrucks(truck.getId());
         this.buyerOrderMapper.insertUseGeneratedKeys(buyerOrder);
 
         Users adminUser = this.usersMapper.selectByPrimaryKey(supplyPosts.getAdminId());
@@ -271,6 +272,9 @@ public class OrderServiceImpl implements OrderService {
     public int reachOrder(BuyerOrder buyerOrder) throws Exception {
         if(buyerOrder.getActualNumber() != null) {
             buyerOrder.setState(6);
+
+            //计算价格,单位分
+            buyerOrder.setPrice(buyerOrder.getActualNumber().intValue()*(85*100));
         }else{
             buyerOrder.setState(5);
         }

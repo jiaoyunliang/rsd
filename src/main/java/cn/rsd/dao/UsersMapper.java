@@ -24,4 +24,6 @@ public interface UsersMapper extends BaseMapper<Users> {
     List<Menu> findMenusByUserId(Long id);
 
     List<Users> selectUserByAccountAndRowBounds(Users users,RowBounds rowBounds);
+
+    int updateUserOpendIdIsNull(String openId);
 }

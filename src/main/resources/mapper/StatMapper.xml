@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.rsd.dao.StatMapper">
+       <select id="selectMeterData" resultType="java.util.HashMap">
+          SELECT
+              time, SUM(heat) heat
+              FROM
+              (SELECT
+              DATE_FORMAT(t.run_date, '%Y-%m-%d') AS time,
+              t.table_number,
+              MAX(IFNULL(t.aggregate_heat, 0)) - IFNULL((SELECT
+              MAX(tt.aggregate_heat)
+              FROM
+              meter_data_report tt
+              WHERE
+              DATE_FORMAT(tt.run_date, '%Y-%m-%d') = DATE_FORMAT(DATE_SUB(t.run_date, INTERVAL 1 DAY), '%Y-%m-%d')
+              AND tt.table_number = t.table_number), 0) AS heat
+              FROM
+              meter_data_report t
+              where DATE_SUB(CURDATE(), INTERVAL 6 DAY)<![CDATA[  <=]]> t.run_date
+              GROUP BY DATE_FORMAT(t.run_date, '%Y-%m-%d') , t.table_number) b
+              GROUP BY time
+
+       </select>
+       <select id="selectCO2MeterData" resultType="java.util.HashMap">
+              SELECT
+              time, SUM(heat*278*0.785) heat
+              FROM
+              (SELECT
+              DATE_FORMAT(t.run_date, '%Y-%m-%d') AS time,
+              t.table_number,
+              MAX(IFNULL(t.aggregate_heat, 0)) - IFNULL((SELECT
+              MAX(tt.aggregate_heat)
+              FROM
+              meter_data_report tt
+              WHERE
+              DATE_FORMAT(tt.run_date, '%Y-%m-%d') = DATE_FORMAT(DATE_SUB(t.run_date, INTERVAL 1 DAY), '%Y-%m-%d')
+              AND tt.table_number = t.table_number), 0) AS heat
+              FROM
+              meter_data_report t
+              where DATE_SUB(CURDATE(), INTERVAL 6 DAY)<![CDATA[  <=]]> t.run_date
+              GROUP BY DATE_FORMAT(t.run_date, '%Y-%m-%d') , t.table_number) b
+              GROUP BY time
+
+       </select>
+
+       <select id="selectUserMeterData" resultType="java.util.HashMap">
+
+              SELECT
+                  ifnull(b.actual_number,0) * 85 as heat, DATE_FORMAT(b.update_date, '%Y-%m-%d') as time
+              FROM
+                  buyer_order b
+              WHERE
+                  b.buyer = #{userId} AND b.state = 7
+              GROUP BY DATE_FORMAT(b.update_date, '%Y-%m-%d')
+
+        </select>
+
+       <select id="selectSumAllNumber" resultType="java.lang.Double">
+              SELECT
+                  SUM(heat) heat
+              FROM
+                  (SELECT
+                      DATE_FORMAT(t.run_date, '%Y-%m-%d') AS time,
+                          t.table_number,
+                          MAX(IFNULL(t.aggregate_heat, 0)) - IFNULL((SELECT
+                                  MAX(tt.aggregate_heat)
+                              FROM
+                                  meter_data_report tt
+                              WHERE
+                                  DATE_FORMAT(tt.run_date, '%Y-%m-%d') = DATE_FORMAT(DATE_SUB(t.run_date, INTERVAL 1 DAY), '%Y-%m-%d')
+                                      AND tt.table_number = t.table_number), 0) AS heat
+                  FROM
+                      meter_data_report t
+                  GROUP BY DATE_FORMAT(t.run_date, '%Y-%m-%d') , t.table_number) b
+       </select>
+
+    <select id="selectDriverName" resultType="java.util.HashMap">
+        SELECT
+            a.id,
+            a.company driverName,
+            b.plate_number plateNumber,
+            b.state state,
+            (select t.buyer from buyer_order t where t.distribution = a.id and t.state in (3,4,5) order by t.update_date desc LIMIT 1) buyer
+        FROM
+            users a
+            inner JOIN
+            trucks b ON a.id = b.user_id
+
+        WHERE
+            a.role = 3
+    </select>
+
+    <select id="selectUserFree" resultType="java.util.HashMap">
+        SELECT
+            a.company,
+            (SELECT
+                    FORMAT(IFNULL(t.price / 100, 0),2)
+                FROM
+                    buyer_order t
+                WHERE
+                    t.buyer = a.id
+                ORDER BY t.update_date DESC
+                LIMIT 1) AS price,
+            (SELECT
+                    t.update_date
+                FROM
+                    buyer_order t
+                WHERE
+                    t.buyer = a.id
+                ORDER BY t.update_date DESC
+                LIMIT 1) updateDate,
+            (SELECT
+                    FORMAT(SUM(IFNULL(c.price / 100, 0)), 2)
+                FROM
+                    buyer_order c
+                WHERE
+                    c.buyer = a.id) allPrice
+        FROM
+            users a
+                INNER JOIN
+            buyer_order b ON a.id = b.buyer AND b.state = 7
+        WHERE
+            a.role = 4
+        GROUP BY b.buyer
+
+    </select>
+</mapper>

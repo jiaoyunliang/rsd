@@ -57,7 +57,9 @@
                 </a>
             <p class="aui-order-fl aui-order-time"><%=data[i].deliveryDate.substr(0,16)%></p>
             <p class="aui-order-fl aui-order-address"><%=data[i].buyerName%></p>
+            <%if(data[i].price){%>
             <p class="aui-order-fl aui-order-door">¥<%=accDiv(data[i].price,100)%></p>
+            <%}%>
         </div>
     <% } %>
 </script>

@@ -128,10 +128,6 @@ public class OrderController {
             buyerOrder.setUpdateDate(new Date());
             buyerOrder.setUpdateUser(user.getId());
 
-            //金额固定
-            buyerOrder.setPrice(425);
-            //处理金额,把元单位乘100转成分.
-            buyerOrder.setPrice(buyerOrder.getPrice() * 100);
             try {
                 if(times == null || times == 1) {
                     orderService.saveOrder(buyerOrder);

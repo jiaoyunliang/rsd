@@ -104,7 +104,7 @@ public class UserController {
             FileCopyUtils.copy(addressPicFile.getBytes(), new File(path + File.separator + newFileName));
 
             message.putData("status","ok");
-            message.putData("path",uploadPath+File.separator+newFileName);
+            message.putData("path",uploadPath+newFileName);
         }catch (Exception e){
             message.putData("status","error");
             message.putData("message",e.getMessage());

@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,9 +62,16 @@ public class MyChannelHandlerAdapter extends ChannelHandlerAdapter {
             byte[] bytes = new byte[1];
             buf.readBytes(bytes);
             buf.readBytes(bytes);
+            String dataStr = printNumber1(meterDataReport.getHexStr());
 
-            meterDataReport.setDataStr(printNumber1(meterDataReport.getHexStr()));
-
+            meterDataReport.setDataStr(dataStr);
+            try {
+                meterDataReport.setRunDate(DateTime.parse(dataStr.substring(118,137),DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate());
+                meterDataReport.setTableNumber(dataStr.substring(2, 10));
+                meterDataReport.setAggregateHeat(new Double(dataStr.substring(32, 41)));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             meterDataReport.setReportDate(new Date());
             this.meterDataReportMapper.insert(meterDataReport);
 
@@ -117,6 +125,12 @@ public class MyChannelHandlerAdapter extends ChannelHandlerAdapter {
         System.out.println(toBinary(7,8));
         System.out.println(Integer.toBinaryString(8));
         System.out.println(toBinary(8,8));
+
+        String str1 = "表号01270818 商代码001111 数据长度2E 累计热量456465.47MWH 热功率000000.00KW 流速0000.0000m³/h 累计流量155747.84m³ 供水温度23.28℃ 回水温度23.43℃ 实时时间2015-10-11 04:25:50 状态正常 ";
+
+        System.out.println(str1.substring(2,10));
+        System.out.println(new Double(str1.substring(32,41)));
+        System.out.println(DateTime.parse(str1.substring(118,137),DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
     }
 
     /**
@@ -183,7 +197,7 @@ public class MyChannelHandlerAdapter extends ChannelHandlerAdapter {
         //sb.append(" ");
         DateTimeFormatter f = DateTimeFormat.forPattern("yyyyMMddHHmmss");
 
-        sb.append("实时时间" + f.parseLocalDateTime(concatPoint(reverse(splitStr(buf.substring(142, 156))), -1, "")).toString("yyyy-MM-dd HH-mm-ss"));
+        sb.append("实时时间" + f.parseLocalDateTime(concatPoint(reverse(splitStr(buf.substring(142, 156))), -1, "")).toString("yyyy-MM-dd HH:mm:ss"));
         sb.append(" ");
 
         long stateBit = 0x0000010000000111L;

@@ -69,7 +69,7 @@ function stateText(val){
     }else if(val == 3){
         returnVal  = "已接单";
     }else if(val == 4){
-        returnVal = "放热中";
+        returnVal = "到达";
     }else if(val == 5){
         returnVal = "开始供热";
     }else if(val == 6){

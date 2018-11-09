@@ -96,7 +96,8 @@
     $(function() {
 
         $('#my-popup').on('open.modal.amui', function() {
-
+            var progress = $.AMUI.progress;
+            progress.configure({ parent: '.tpl-form-file-img' });
             $('#drag-and-drop-zone').dmUploader({
                 url: _ctx + '/admin/user/fileUploadPicture',
                 maxFileSize: 3000000, // 3 Megs max
@@ -132,17 +133,17 @@
                     }
                 },
                 onBeforeUpload: function(id){
-
+                    progress.start();
                 },
                 onUploadProgress: function(id, percent){
-
+                    progress.set(percent);
                 },
                 onUploadSuccess: function(id, data){
                     $("input[name='addressPic']").val(data.data.path);
-                    console.log(data.data.path);
+                    progress.done(true);
                 },
                 onUploadError: function(id, xhr, status, message){
-
+                    progress.done(true);
                 },
                 onFallbackMode: function(){
 
@@ -222,7 +223,7 @@
         $("#my-popup").modal('open');
 
         if(data.addressPic){
-            $("#addressPicImg").src(data.addressPic);
+            $("#addressPicImg").attr("src",_ctx+ "/" + data.addressPic);
         }
 
         var key,value,tagName,type,arr;

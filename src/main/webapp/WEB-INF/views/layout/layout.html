@@ -71,10 +71,20 @@
     }
 </script>
 <script>
-    if ($.AMUI && $.AMUI.validator) {
-        $.AMUI.validator.patterns.mobile = /^\s*1\d{10}\s*$/;
-        $.AMUI.validator.patterns.idcode = /^\d{6}(18|19|20)?\d{2}(0[1-9]|1[012])(0[1-9]|[12]\d|3[01])\d{3}(\d|[xX])$/
-    }
+    $(function() {
+        if ($.AMUI && $.AMUI.validator) {
+            $.AMUI.validator.patterns.mobile = /^\s*1\d{10}\s*$/;
+            $.AMUI.validator.patterns.idcode = /^\d{6}(18|19|20)?\d{2}(0[1-9]|1[012])(0[1-9]|[12]\d|3[01])\d{3}(\d|[xX])$/
+        }
+    });
+
+    $(document).ajaxStart(function(){
+        $.AMUI.progress.start();
+    });
+
+    $(document).ajaxStop(function(){
+        $.AMUI.progress.done(true);
+    });
 </script>
 </body>
 </html>

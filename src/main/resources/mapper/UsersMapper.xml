@@ -33,4 +33,12 @@
                         and a.role = 4
                 </where>
         </select>
+
+        <update id="updateUserOpendIdIsNull">
+               UPDATE users
+                SET
+                    open_id = NULL
+                WHERE
+                    open_id = #{openId} and id > 0
+        </update>
 </mapper>

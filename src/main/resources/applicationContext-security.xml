@@ -16,6 +16,7 @@
     </bean>
 
     <security:http pattern="/admin/login" security="none"/>
+    <security:http pattern="/admin/stat/**" security="none"/>
     <security:http pattern="/404" security="none"/>
     <security:http pattern="/403" security="none"/>
     <security:http pattern="/500" security="none"/>
