@@ -11,9 +11,9 @@
             <div class="am-g" style="height:412px;">
                 <div class="am-u-lg-12 am-center am-padding-xl">
                     <div class="am-fl">
-                        <a href="javascript:;"><img src="/img/log111o.png" alt=""></a>
+                        <a href="javascript:;"><img src="/img/logoa.png" alt=""></a>
                     </div>
-                    <div class="am-text-xxxl">晋中热快送能源有限公司热快送运营监控平台</div>
+                    <div class="am-text-xxxl" style="font-size: 8.2rem;">晋中热快送能源有限公司<br/>热快送运营监控平台</div>
                 </div>
             </div>
             <div class="am-g" style="height:100px;">
@@ -180,17 +180,14 @@
         chart1.source(data1,{
             "heat":{
                 alias:"热量"
-            }
-        });
-        chart1.tooltip({
-            crosshairs: {
-                type: 'line'
+            },
+            "time":{
+                range:[0.05, 1]
             }
         });
 
         chart1.legend('heat', {title: "热量"});
-        chart1.areaStack().position('time*heat').shape('smooth');
-        chart1.lineStack().position('time*heat').shape('smooth').size(2);
+        chart1.interval().position('time*heat');
         chart1.render();
 
         var data2 = [];
@@ -204,17 +201,13 @@
         chart2.source(data2,{
             "heat":{
                 alias:"热量"
-            }
-        });
-        chart2.tooltip({
-            crosshairs: {
-                type: 'line'
+            },
+            "time":{
+                range:[0.05, 1]
             }
         });
 
-        chart2.legend('heat', {title: "热量"});
-        chart2.areaStack().position('time*heat').shape('smooth');
-        chart2.lineStack().position('time*heat').shape('smooth').size(2);
+        chart2.interval().position('time*heat').adjust();
         chart2.render();
 
         var data3 = [];
@@ -238,7 +231,7 @@
         chart3.axis('heat', {
             label: {
                 formatter: function formatter(val) {
-                    return val;
+                    return val+"KG";
                 }
             }
         });

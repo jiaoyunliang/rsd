@@ -30,6 +30,14 @@
 </script>
 <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
 <script type="text/javascript">
+    $.getJSON("user",function(data){
+        $("#address").val(data.data.user.address);
+        $("#phone").val(data.data.user.phone);
+
+        if(data.data.user.role != 2){
+            top.location = "order_warn.html";
+        }
+    });
     $(function(){
         $.post("trucks/list",{},function(json){
             var tplx = document.getElementById('tpl').innerHTML;
@@ -41,7 +49,7 @@
                 $.actions({
                     actions: [
                         {
-                            text: "正常",
+                            text: "储热中",
                             className: "color-primary",
                             onClick:function () {
                                 $.showLoading("提交中...");

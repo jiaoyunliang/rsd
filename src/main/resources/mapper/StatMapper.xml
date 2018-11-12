@@ -52,6 +52,7 @@
                   buyer_order b
               WHERE
                   b.buyer = #{userId} AND b.state = 7
+                  and DATE_SUB(CURDATE(), INTERVAL 6 DAY)<![CDATA[  <=]]> b.update_date
               GROUP BY DATE_FORMAT(b.update_date, '%Y-%m-%d')
 
         </select>

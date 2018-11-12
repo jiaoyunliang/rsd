@@ -40,9 +40,6 @@ public class WeiXinMessageService {
     @Value("${appId}")
     private String appId;
 
-    @Value("${orderTmpl}")
-    private String orderTmpl;
-
     @Value("${alert.time}")
     private Integer alertTime;
 
@@ -67,7 +64,7 @@ public class WeiXinMessageService {
     @Autowired
     private TrucksMapper trucksMapper;
 
-    public static String WEIXIN_WEB_URL ="https://open.weixin.qq.com/connect/oauth2/authorize?appid={0}&redirect_uri=http://www.jxzyn.cn/wx/view?key={1}&response_type=code&scope=snsapi_base&state=1#wechat_redirect";
+    public static String WEIXIN_WEB_URL ="https://open.weixin.qq.com/connect/oauth2/authorize?appid={0}&redirect_uri={1}wx/view?key={2}&response_type=code&scope=snsapi_base&state=1#wechat_redirect";
 
     @Scheduled(fixedDelay = 1000*60,initialDelay = 100)
     public void sendTmplMessage(){
@@ -93,13 +90,12 @@ public class WeiXinMessageService {
                 truck.setUserId(adminUser.getId());
                 truck = this.trucksMapper.selectOne(truck);
                 if(adminUser != null && adminUser.getOpenId() != null) {
-                    addAppIdTmplMessage(adminUser.getAppId(), adminUser.getOpenId(), orderTmpl, "order_detail_send_new.html?id=" + buyerOrder.getId(), "你有新的订单需要运输！", buyerOrder.getOrderCode(),
+                    addAppIdTmplMessage(adminUser.getAppId(), adminUser.getOpenId(), adminUser.getOrderTmpl(), "order_detail_send_new.html?id=" + buyerOrder.getId(), "你有新的订单需要运输！", buyerOrder.getOrderCode(),
                             DateUtils.formatDate(buyerOrder.getCreateDate(), "yyyy-MM-dd HH:mm"),
                             "热量", buyerOrder.getBuyerName(), truck.getPlateNumber(), "");
                 }
             }
         }
-
     }
 
     @Scheduled(fixedDelay = 3000,initialDelay = 100)
@@ -108,10 +104,17 @@ public class WeiXinMessageService {
         List<MsgSendLog> msgSendLogs = this.msgSendLogMapper.selectByRowBounds(null,new RowBounds(0,20));
 
         for(MsgSendLog msgSendLog:msgSendLogs){
-            String megUrl =  MessageFormat.format("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={0}",accessTokenServie.getAccessToken(msgSendLog.getAppId()));
+            Users user = new Users();
+            user.setOpenId(msgSendLog.getOpenId());
+
+            user = this.usersMapper.selectOne(user);
+
+            String megUrl =  MessageFormat.format("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={0}",accessTokenServie.getAccessToken(user.getAppId()));
 
             JSONObject json = JSON.parseObject(msgSendLog.getMsgBody());
+
             json.put("touser",msgSendLog.getOpenId());
+            json.put("template_id",user.getOrderTmpl());
             StringEntity entity = new StringEntity(json.toJSONString(),"utf-8");
 
             try {
@@ -127,14 +130,14 @@ public class WeiXinMessageService {
         }
     }
 
-    public String addAppIdTmplMessage(String appId,String openId,String tmplId,String url,String... msg){
+    public String addAppIdTmplMessage(String appId,String openId,String tmplId,String webUrl,String url,String... msg){
 
         String result = "";
         JSONObject json = JSON.parseObject("{}");
 
         json.put("touser",openId);
         json.put("template_id",tmplId);
-        json.put("url",MessageFormat.format(WEIXIN_WEB_URL,appId,url));
+        json.put("url",MessageFormat.format(WEIXIN_WEB_URL,appId,webUrl,url));
 
         JSONObject data = JSON.parseObject("{}");
 
@@ -165,14 +168,14 @@ public class WeiXinMessageService {
 
         return result;
     }
-    public String sendAppIdTmplMessage(String appId,String openId,String tmplId,String url,String... msg){
+    public String sendAppIdTmplMessage(String appId,String openId,String tmplId,String webUrl,String url,String... msg){
         String megUrl =  MessageFormat.format("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={0}",accessTokenServie.getAccessToken(appId));
         String result = "";
         JSONObject json = JSON.parseObject("{}");
 
         json.put("touser",openId);
         json.put("template_id",tmplId);
-        json.put("url",MessageFormat.format(WEIXIN_WEB_URL,appId,url));
+        json.put("url",MessageFormat.format(WEIXIN_WEB_URL,appId,webUrl,url));
 
         JSONObject data = JSON.parseObject("{}");
 
@@ -209,9 +212,9 @@ public class WeiXinMessageService {
 
         return result;
     }
-    public String sendTmplMessage(String openId,String tmplId,String url,String... msg){
+    public String sendTmplMessage(String openId,String tmplId,String webUrl,String url,String... msg){
 
-        return sendAppIdTmplMessage(appId,openId,tmplId,url,msg);
+        return sendAppIdTmplMessage(appId,openId,tmplId,webUrl,url,msg);
 
     }
 

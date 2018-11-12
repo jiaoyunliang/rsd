@@ -86,7 +86,7 @@
                 <div class="thumbnails">
                     <%if (buyer.addressPic){%>
                     <div class="thumbnail">
-                        <img src="img/<%=buyer.addressPic%>" style="width:100%;height:100%;"/>
+                        <img src="<%=buyer.addressPic%>" style="width:100%;height:100%;"/>
                     </div>
                     <%}%>
                 </div>
@@ -125,11 +125,10 @@
 
             $("#momentsDiv img").on("click",function(e){
                 var url =$(this).attr("src");
-                var host = "http://"+window.location.host+"/";
 
                 wx.previewImage({
-                    current: host+url, // 当前显示图片的http链接
-                    urls: [host+result.data.order.startPic,host+result.data.order.endPic,host+"img/"+result.data.buyer.addressPic] // 需要预览的图片http链接列表
+                    current: url, // 当前显示图片的http链接
+                    urls: [result.data.order.startPic,host+result.data.order.endPic,result.data.buyer.addressPic] // 需要预览的图片http链接列表
                 });
             });
 

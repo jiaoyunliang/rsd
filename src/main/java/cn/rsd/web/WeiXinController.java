@@ -81,6 +81,12 @@ public class WeiXinController {
     @Autowired
     private OrderService orderService;
 
+    @RequestMapping()
+    @ResponseBody
+    public String index(HttpServletRequest request){
+        return request.getParameter("echostr");
+    }
+
     @RequestMapping(value = "/msg",method = {RequestMethod.GET})
     @ResponseBody
     public void msg(HttpServletRequest request,HttpServletResponse response) throws IOException {

@@ -118,11 +118,10 @@
 
         $("#momentsDiv img").on("click",function(e){
             var url =$(this).attr("src");
-            var host = "http://"+window.location.host+"/";
 
             wx.previewImage({
-                current: host+url, // 当前显示图片的http链接
-                urls: [host+result.data.order.startPic,host+result.data.order.endPic] // 需要预览的图片http链接列表
+                current: url, // 当前显示图片的http链接
+                urls: [result.data.order.startPic,result.data.order.endPic] // 需要预览的图片http链接列表
             });
         });
 

@@ -28,7 +28,24 @@ public class Users extends BasePo implements UserDetails {
     private String longitude;
     private String appId;
     private String addressPic;
+    private String orderTmpl;
+    private String webUrl;
 
+    public String getWebUrl() {
+        return webUrl;
+    }
+
+    public void setWebUrl(String webUrl) {
+        this.webUrl = webUrl;
+    }
+
+    public String getOrderTmpl() {
+        return orderTmpl;
+    }
+
+    public void setOrderTmpl(String orderTmpl) {
+        this.orderTmpl = orderTmpl;
+    }
 
     @Transient
     private Double balance;

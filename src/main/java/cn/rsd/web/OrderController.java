@@ -33,6 +33,10 @@ import tk.mybatis.mapper.entity.Example;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
 
 /**
@@ -63,6 +67,12 @@ public class OrderController {
 
     @Value("${uploadPath}")
     private String uploadPath;
+
+    @Value("${imgPath}")
+    private String imgPath;
+
+    @Value("${imgWebUrl}")
+    private String imgWebUrl;
 
     @Autowired
     private WeiXinMessageService weiXinMessageServie;
@@ -148,8 +158,24 @@ public class OrderController {
     public ReturnMessage uploadImg(String imgData,String fileName) throws IOException {
         ReturnMessage message = ReturnMessage.buildMessage();
         BASE64Decoder decoder = new BASE64Decoder();
-        String dir = System.getProperty("rsd.root");
+        String dir = this.imgPath;
         String path = dir+ uploadPath ;
+
+        Set<PosixFilePermission> perms = new HashSet<>();
+        //设置所有者的读取权限
+        perms.add(PosixFilePermission.OWNER_READ);
+        //设置所有者的写权限
+        perms.add(PosixFilePermission.OWNER_WRITE);
+        //设置所有者的执行权限
+        perms.add(PosixFilePermission.OWNER_EXECUTE);
+        //设置组的读取权限
+        perms.add(PosixFilePermission.GROUP_READ);
+        perms.add(PosixFilePermission.GROUP_EXECUTE);
+        //设置组的读取权限
+        perms.add(PosixFilePermission.OTHERS_READ);
+        //设置其他的读取权限
+        perms.add(PosixFilePermission.OTHERS_EXECUTE);
+        //设置其他的读取权限
 
         //如果文件夹不存在
         File fileDir = new File(path);
@@ -157,9 +183,13 @@ public class OrderController {
 
         String newFileName = UUID.randomUUID()+"."+ FilenameUtils.getExtension(fileName);
         byte[] b = decoder.decodeBuffer(imgData.split(",")[1]);
-        FileCopyUtils.copy(b,new File(path+File.separator+newFileName));
+        File newFile = new File(path+File.separator+newFileName);
+        FileCopyUtils.copy(b,newFile);
 
-        message.putData("newFileName",uploadPath+newFileName);
+        Path pathDest = Paths.get(newFile.getAbsolutePath());
+        Files.setPosixFilePermissions(pathDest, perms);
+
+        message.putData("newFileName",imgWebUrl+uploadPath+newFileName);
         return message;
     }
 

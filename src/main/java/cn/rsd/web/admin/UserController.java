@@ -26,9 +26,11 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.*;
 
 /**
  * @author 焦云亮
@@ -51,6 +53,12 @@ public class UserController {
 
     @Value("${uploadPath}")
     private String uploadPath;
+
+    @Value("${imgPath}")
+    private String imgPath;
+
+    @Value("${imgWebUrl}")
+    private String imgWebUrl;
 
     @Autowired
     private UserService userService;
@@ -92,19 +100,40 @@ public class UserController {
     public ReturnMessage uploadImg(MultipartFile addressPicFile) throws IOException {
         ReturnMessage message = ReturnMessage.buildMessage();
         String dir = System.getProperty("rsd.root");
-        String path = dir+ uploadPath ;
+        String path = dir+ this.imgPath;
 
         try {
             //如果文件夹不存在
             File fileDir = new File(path);
             fileDir.mkdirs();
 
+
+            Set<PosixFilePermission> perms = new HashSet<>();
+            //设置所有者的读取权限
+            perms.add(PosixFilePermission.OWNER_READ);
+            //设置所有者的写权限
+            perms.add(PosixFilePermission.OWNER_WRITE);
+            //设置所有者的执行权限
+            perms.add(PosixFilePermission.OWNER_EXECUTE);
+            //设置组的读取权限
+            perms.add(PosixFilePermission.GROUP_READ);
+            perms.add(PosixFilePermission.GROUP_EXECUTE);
+            //设置组的读取权限
+            perms.add(PosixFilePermission.OTHERS_READ);
+            //设置其他的读取权限
+            perms.add(PosixFilePermission.OTHERS_EXECUTE);
+            //设置其他的读取权限
+
             String newFileName = UUID.randomUUID() + "." + FilenameUtils.getExtension(addressPicFile.getOriginalFilename());
 
-            FileCopyUtils.copy(addressPicFile.getBytes(), new File(path + File.separator + newFileName));
+            File newFile = new File(path+File.separator+newFileName);
+            FileCopyUtils.copy(addressPicFile.getBytes(),newFile);
+
+            Path pathDest = Paths.get(newFile.getAbsolutePath());
+            Files.setPosixFilePermissions(pathDest, perms);
 
             message.putData("status","ok");
-            message.putData("path",uploadPath+newFileName);
+            message.putData("path",imgWebUrl+uploadPath+newFileName);
         }catch (Exception e){
             message.putData("status","error");
             message.putData("message",e.getMessage());

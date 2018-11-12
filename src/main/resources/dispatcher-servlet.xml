@@ -124,7 +124,7 @@
             <mvc:exclude-mapping path="/admin/**"/>
             <mvc:exclude-mapping path="/wx/**"/>
             <mvc:exclude-mapping path="/404"/>
-            <mvc:exclude-mapping path="/uploadPath/*"/>
+            <mvc:exclude-mapping path="/uploadPath/**"/>
             <bean class="cn.rsd.LoginInterceptor"></bean>
         </mvc:interceptor>
     </mvc:interceptors>

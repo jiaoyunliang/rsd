@@ -6,7 +6,6 @@ import cn.rsd.service.OrderService;
 import cn.rsd.service.WeiXinMessageService;
 import org.apache.http.client.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,13 +42,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private UserAccountMapper userAccountMapper;
-
-    @Value("${orderTmpl}")
-    private String orderTmpl;
-
-    @Value("${webUrl}")
-    private String webUrl;
-
     @Autowired
     private StringRedisTemplate redisTemplate;
 
@@ -98,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
 
         if(driver != null && driver.getOpenId() != null){
 
-            weiXinMessageServie.sendAppIdTmplMessage(driver.getAppId(), driver.getOpenId(), orderTmpl, "order_detail_send_new.html?id=" + buyerOrder.getId(), "你有新的订单需要运输！", buyerOrder.getOrderCode(),
+            weiXinMessageServie.sendAppIdTmplMessage(driver.getAppId(), driver.getOpenId(), driver.getOrderTmpl(),driver.getWebUrl(), "order_detail_send_new.html?id=" + buyerOrder.getId(), "你有新的订单需要运输！", buyerOrder.getOrderCode(),
                     DateUtils.formatDate(buyerOrder.getCreateDate(),"yyyy-MM-dd HH:mm"),
                     "热量", buyerOrder.getBuyerName(), truck.getPlateNumber(), "");
         }
@@ -179,13 +171,13 @@ public class OrderServiceImpl implements OrderService {
         Users driver = this.usersMapper.selectByPrimaryKey(buyerOrder.getDistribution());
         //发送订单通知
         if (adminUser.getOpenId() != null) {
-            weiXinMessageServie.sendTmplMessage(adminUser.getOpenId(), orderTmpl, "order_detail_preview.html?id=" + buyerOrder.getId(), "你有新的订单！", buyerOrder.getOrderCode(),
+            weiXinMessageServie.sendAppIdTmplMessage(adminUser.getAppId(),adminUser.getOpenId(), adminUser.getOrderTmpl(), adminUser.getWebUrl(),"order_detail_preview.html?id=" + buyerOrder.getId(), "你有新的订单！", buyerOrder.getOrderCode(),
                     DateUtils.formatDate(buyerOrder.getCreateDate(),"yyyy-MM-dd HH:mm"),
                     "热量", buyerOrder.getBuyerName(), truck.getPlateNumber(), "");
         }
 
         if(driver != null && driver.getOpenId() != null){
-            weiXinMessageServie.sendTmplMessage(driver.getOpenId(), orderTmpl, "order_detail_send_new.html?id=" + buyerOrder.getId(), "你有新的订单需要运输！", buyerOrder.getOrderCode(),
+            weiXinMessageServie.sendAppIdTmplMessage(driver.getAppId(),driver.getOpenId(), driver.getOrderTmpl(), driver.getWebUrl(), "order_detail_send_new.html?id=" + buyerOrder.getId(), "你有新的订单需要运输！", buyerOrder.getOrderCode(),
                     DateUtils.formatDate(buyerOrder.getCreateDate(),"yyyy-MM-dd HH:mm"),
                     "热量", buyerOrder.getBuyerName(), truck.getPlateNumber(), "");
 
@@ -272,6 +264,10 @@ public class OrderServiceImpl implements OrderService {
     public int reachOrder(BuyerOrder buyerOrder) throws Exception {
         if(buyerOrder.getActualNumber() != null) {
             buyerOrder.setState(6);
+
+            if(buyerOrder.getActualNumber() < 1){
+                throw new Exception("实际热量不能小于1!");
+            }
 
             //计算价格,单位分
             buyerOrder.setPrice(buyerOrder.getActualNumber().intValue()*(85*100));

@@ -5,6 +5,7 @@ import cn.rsd.ReturnMessage;
 import cn.rsd.dao.TrucksMapper;
 import cn.rsd.po.SupplyPosts;
 import cn.rsd.po.Trucks;
+import cn.rsd.po.Users;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,16 +46,23 @@ public class TrucksController {
 
         List<Trucks> list= this.trucksMapper.select(trucks);
         message.putData("list",list);
+
+        Users user = (Users) request.getSession().getAttribute("user");
+
+        if(user == null || user.getRole() != 2){
+            message.setMsg("没有权限");
+            message.setCode(ReturnCode.EXCEPTION.value());
+            message.getData().clear();
+        }
+
         return message;
     }
-
-
-    @RequestMapping(value = "normal",method = RequestMethod.POST)
+    @RequestMapping(value = "await",method = RequestMethod.POST)
     @ResponseBody
-    public ReturnMessage normal(Long id){
+    public ReturnMessage await(Long id, HttpServletRequest request){
         ReturnMessage message = ReturnMessage.buildMessage();
         try{
-            updateTruckState(id,1);
+            updateTruckState(id,1,request);
         }catch (Exception e){
             logger.error(e,e);
             message.setCode(ReturnCode.EXCEPTION.value());
@@ -64,7 +72,30 @@ public class TrucksController {
         return message;
     }
 
-    private void updateTruckState(Long id,Integer state)throws Exception{
+    @RequestMapping(value = "normal",method = RequestMethod.POST)
+    @ResponseBody
+    public ReturnMessage normal(Long id, HttpServletRequest request){
+        ReturnMessage message = ReturnMessage.buildMessage();
+        try{
+            updateTruckState(id,5,request);
+        }catch (Exception e){
+            logger.error(e,e);
+            message.setCode(ReturnCode.EXCEPTION.value());
+            message.setMsg(e.getMessage());
+        }
+
+        return message;
+    }
+
+    private void updateTruckState(Long id,Integer state, HttpServletRequest request)throws Exception{
+        Users user = (Users) request.getSession().getAttribute("user");
+
+        Trucks oldTrucks = this.trucksMapper.selectByPrimaryKey(id);
+
+        if(user == null ||  ((user.getRole() == 3  && !user.getId().equals(oldTrucks.getUserId())))){
+            throw new Exception("没有权限");
+        }
+
         Trucks trucks = new Trucks();
         trucks.setId(id);
         trucks.setState(state);
@@ -73,10 +104,10 @@ public class TrucksController {
 
     @RequestMapping(value = "outage",method = RequestMethod.POST)
     @ResponseBody
-    public ReturnMessage outage(Long id){
+    public ReturnMessage outage(Long id, HttpServletRequest request){
         ReturnMessage message = ReturnMessage.buildMessage();
         try{
-            updateTruckState(id,3);
+            updateTruckState(id,3,request);
         }catch (Exception e){
             logger.error(e,e);
             message.setCode(ReturnCode.EXCEPTION.value());
@@ -88,11 +119,11 @@ public class TrucksController {
 
     @RequestMapping(value = "repair",method = RequestMethod.POST)
     @ResponseBody
-    public ReturnMessage repair(Long id){
+    public ReturnMessage repair(Long id, HttpServletRequest request){
         ReturnMessage message = ReturnMessage.buildMessage();
 
         try{
-            updateTruckState(id,2);
+            updateTruckState(id,2,request);
         }catch (Exception e){
             logger.error(e,e);
             message.setCode(ReturnCode.EXCEPTION.value());

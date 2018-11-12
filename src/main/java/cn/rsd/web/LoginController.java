@@ -46,6 +46,10 @@ public class LoginController {
 
     @Value("${appId}")
     private String appId;
+    @Value("${orderTmpl}")
+    private String orderTmpl;
+    @Value("${webUrl}")
+    private String webUrl;
     @Value("${appSecret}")
     private String appSecret;
 
@@ -66,6 +70,8 @@ public class LoginController {
 
                 user.setOpenId(openid);
                 user.setAppId(this.appId);
+                user.setOrderTmpl(this.orderTmpl);
+                user.setWebUrl(this.webUrl);
                 this.usersMapper.updateByPrimaryKey(user);
             }
 
