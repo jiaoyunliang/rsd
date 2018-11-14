@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -52,12 +53,27 @@ public class LoginController {
     private String webUrl;
     @Value("${appSecret}")
     private String appSecret;
+    @Value("${userRole}")
+    private String userRole;
 
     @RequestMapping("login")
     @ResponseBody
     public ReturnMessage login(Users users,String openid,HttpServletRequest request){
         ReturnMessage message = ReturnMessage.buildMessage();
-        Users user = this.usersMapper.selectOne(users);
+
+        Example example = new Example(Users.class);
+        Example.Criteria criteria = example.createCriteria().andEqualTo(users);
+        //TODO 有问题,
+        Users user = null;
+
+        if(userRole != null){
+            criteria.andIn("role", Arrays.asList(this.userRole.split(",")));
+        }
+        List<Users> users1= this.usersMapper.selectByExample(example);
+
+        if(users1 != null && !users1.isEmpty()){
+            user = users1.get(0);
+        }
 
         if(user == null){
             message.setCode(ReturnCode.EXCEPTION.value());

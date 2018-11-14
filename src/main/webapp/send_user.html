@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>热速达</title>
+    <link rel="stylesheet" href="css/weui.css"/>
+    <link rel="stylesheet" href="css/weui2.css"/>
+    <link rel="stylesheet" href="css/weui3.css"/>
+    <link rel="stylesheet" href="css/order.css">
+    <script src="js/zepto.min.js"></script>
+    <script src="js/lrz.min.js"></script>
+    <script src="js/example.js"></script>
+</head>
+<body ontouchstart style="background-color: #f8f8f8;">
+<div class="page-bd">
+    <div class="aui-order-title">
+
+    </div>
+</div>
+<script id="tpl" type="text/html">
+    <div class="weui_cells_title">个人信息</div>
+    <div class="weui_cells aui-order-box">
+        <div class="weui_cell">
+            地址：<%=user.address%>
+        </div>
+        <div class="weui_cell">
+            单位：<%=user.company%>
+        </div>
+        <div class="weui_cell">
+            电话：<a tel="<%=user.phone%>" ><%=user.phone%></a>
+        </div>
+    </div>
+    <%if (account){%>
+        <div class="weui_cells_title">余额信息</div>
+        <div class="weui_cells aui-order-box">
+            <div class="weui_cell">
+                余额(元)：<%=accDiv(account.balance,100)%>
+            </div>
+        </div>
+    <%}%>
+
+    <%if (truck){%>
+    <div class="weui_cells_title">车辆信息</div>
+    <div class="weui_cells aui-order-box weui_cells_access">
+        <div class="weui_cell">
+            车牌号：<%=truck.plateNumber%>
+        </div>
+        <a class="weui_cell" href="javascript:heatStorage(<%=truck.id%>);">
+            <div class="weui_cell_bd weui_cell_primary">
+            状&nbsp;&nbsp;态：<%=truckState(truck.state)%>
+            </div>
+            <div class="weui_cell_ft">点击更改</div>
+        </a>
+    </div>
+    <%}%>
+    <%if (account){%>
+    <%}%>
+    <div class="weui_btn_area">
+        <a class="weui_btn weui_btn_primary" href="/logout" id="orderBtn">切换帐户</a>
+        <a class="weui_btn weui_btn_default" href="/user_pass.html" id="passBtn">修改密码</a>
+    </div>
+</script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $.getJSON("user",function(result){
+            var tplx = document.getElementById('tpl').innerHTML;
+            var desc1=tpl(tplx,result.data);
+            $('.aui-order-title').html(desc1);
+        });
+    });
+    function truckState(v) {
+        var stateText = "";
+        switch (v){
+            case 1:
+                stateText = "储热完成";
+                break;
+            case 2:
+                stateText = "修理";
+                break;
+            case 3:
+                stateText = "停运";
+                break;
+            case 4:
+                stateText = "运送中";
+                break;
+            case 5:
+                stateText = "储热中";
+                break;
+        }
+
+        return stateText;
+    }
+    function heatStorage(id) {
+        $.showLoading("提交中...");
+        $.post("trucks/await",
+                {
+                    id:id
+                },
+                function(data){
+                    $.hideLoading();
+                    if(data.code == "200"){
+                        $.toast("成功!");
+                        top.location.reload();
+                    }else{
+                        $.toast(data.msg,"forbidden");
+                    }
+                },"json");
+    }
+
+</script>
+</body>
+</html>

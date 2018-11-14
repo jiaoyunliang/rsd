@@ -124,8 +124,6 @@ public class UserServiceImpl implements UserService, UserDetailsService,ClientDe
             oldAccount.setUpdateUser(userAccount.getUpdateUser());
 
             this.userAccountMapper.insertUseGeneratedKeys(oldAccount);
-            userAccount = oldAccount;
-
         }else {
             oldAccount.setUpdateDate(userAccount.getUpdateDate());
             oldAccount.setUpdateUser(userAccount.getUpdateUser());
@@ -136,7 +134,7 @@ public class UserServiceImpl implements UserService, UserDetailsService,ClientDe
         UserTrack userTrack = new UserTrack();
         userTrack.setOrderId(null);
         userTrack.setAccountBalance(balance);
-        userTrack.setTrackType(UserTrack.TrackTypeEnum.PAY.ordinal());
+        userTrack.setTrackType(UserTrack.TrackTypeEnum.PAY.value());
         userTrack.setCreateDate(new Date());
         userTrack.setDeductionsAccount(oldAccount.getId());
 

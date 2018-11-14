@@ -12,7 +12,7 @@ import java.net.SocketTimeoutException;
 public class Client1 {
     public static void main(String[] args) throws IOException {
         //客户端请求与本机在20006端口建立TCP连接
-        Socket client = new Socket("39.106.2.250", 5570);
+        Socket client = new Socket("127.0.0.1", 5570);
         client.setSoTimeout(10000);
         //获取键盘输入
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));

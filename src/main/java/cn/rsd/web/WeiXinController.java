@@ -207,14 +207,14 @@ public class WeiXinController {
             request.getSession().setAttribute("user",user);
             request.getSession().setAttribute("supplyPosts",supplyPosts);
 
-            logger.debug("key={},角色={}",key,user.getRole());
-            if(key != null && key.equals("order_new.html") && user != null && user.getRole() != null && user.getRole() == 3){
-                key = "order_send.html";
-            }
-            if(key != null && key.equals("order_new.html") && user != null && user.getRole() != null && user.getRole() == 2){
-                key = "order.html";
-            }
-            logger.debug("key={},角色={}",key,user.getRole());
+//            logger.debug("key={},角色={}",key,user.getRole());
+//            if(key != null && key.equals("order_new.html") && user != null && user.getRole() != null && user.getRole() == 3){
+//                key = "order_send.html";
+//            }
+//            if(key != null && key.equals("order_new.html") && user != null && user.getRole() != null && user.getRole() == 2){
+//                key = "order.html";
+//            }
+//            logger.debug("key={},角色={}",key,user.getRole());
             forwardUrl = "/"+key+queryFu+"openid="+openid;
         }
 

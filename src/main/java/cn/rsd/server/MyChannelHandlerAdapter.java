@@ -5,8 +5,8 @@ import cn.rsd.po.MeterDataReport;
 import cn.rsd.util.DataConverter;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -23,7 +23,7 @@ import java.util.Date;
  */
 @Component("myChannelHandlerAdapter")
 @ChannelHandler.Sharable
-public class MyChannelHandlerAdapter extends ChannelHandlerAdapter {
+public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
 
     private ByteBuf buf;
 

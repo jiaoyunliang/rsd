@@ -164,7 +164,7 @@
 
     var now = new Date();
     now.setHours(now.getHours() + 2);
-    now.setMinutes(now.getMinutes() + 5);
+
     var str = now.getFullYear() + "-" + fix((now.getMonth() + 1), 2) + "-" + fix(now.getDate(), 2) + " " + fix(now.getHours(), 2) + ":" + fix(now.getMinutes(), 2);
     $("#deliveryDate").val(str);
 

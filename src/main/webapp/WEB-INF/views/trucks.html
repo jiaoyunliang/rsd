@@ -137,7 +137,7 @@
           var state;
           switch (data){
             case 1:
-              state = "正常";
+              state = "储热完成";
               break;
             case 2:
               state = "修理";
@@ -148,8 +148,9 @@
             case 4:
               state = "运送中";
               break;
-            default:
-              state = "未知";
+            case 5:
+              state = "储热中";
+              break;
           }
           return state;
         }},

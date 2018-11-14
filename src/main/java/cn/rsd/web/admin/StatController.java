@@ -59,6 +59,38 @@ public class StatController {
         return view;
     }
 
+    @RequestMapping("index1")
+    public ModelAndView index1(){
+        ModelAndView view = new ModelAndView("stat1");
+
+        Double heatSum = this.statMapper.selectSumAllNumber();
+        view.addObject("heatSum",heatSum);
+
+        Users users = new Users();
+        users.setRole(4);
+        List<Users> list = this.usersMapper.select(users);
+
+        view.addObject("users",list);
+
+        return view;
+    }
+
+    @RequestMapping("index2")
+    public ModelAndView index2(){
+        ModelAndView view = new ModelAndView("stat2");
+
+        Double heatSum = this.statMapper.selectSumAllNumber();
+        view.addObject("heatSum",heatSum);
+
+        Users users = new Users();
+        users.setRole(4);
+        List<Users> list = this.usersMapper.select(users);
+
+        view.addObject("users",list);
+
+        return view;
+    }
+
     @RequestMapping("heat/line")
     @ResponseBody
     public List<Map<String,Object>> heatLine(){

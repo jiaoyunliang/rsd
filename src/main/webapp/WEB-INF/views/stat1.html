@@ -187,7 +187,7 @@
         });
 
         chart1.legend('heat', {title: "热量"});
-        chart1.interval().position('time*heat').size(35);
+        chart1.interval().position('time*heat').color('heat').size(30);
         chart1.render();
 
         var data2 = [];
@@ -207,7 +207,7 @@
             }
         });
 
-        chart2.interval().position('time*heat').size(35);
+        chart2.interval().position('time*heat').color('heat').size(30);
         chart2.render();
 
         var data3 = [];
@@ -236,8 +236,7 @@
             }
         });
         chart3.legend('heat', {title: "减少碳排放量"});
-        chart3.areaStack().position('time*heat').shape('smooth');
-        chart3.lineStack().position('time*heat').shape('smooth').size(2);
+        chart3.line().position('time*heat').size(2);
         chart3.render();
 
         heatLine();

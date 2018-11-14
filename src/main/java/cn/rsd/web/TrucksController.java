@@ -96,6 +96,10 @@ public class TrucksController {
             throw new Exception("没有权限");
         }
 
+        if(user.getRole() == 3 && oldTrucks.getState() != 5){
+            throw new Exception("无法变更车辆状态!");
+        }
+
         Trucks trucks = new Trucks();
         trucks.setId(id);
         trucks.setState(state);

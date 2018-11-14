@@ -169,25 +169,42 @@
         chart.lineStack().position('time*heat').shape('smooth').size(2);
         chart.render();
 
-        var data1 = [];
-
+        var data1 =[];
         var chart1 = new G2.Chart({
             container: 'c2',
             forceFit: true,
-            padding: 50,
             height: 500
         });
-        chart1.source(data1,{
-            "heat":{
-                alias:"热量"
-            },
-            "time":{
-                range:[0.09, 0.98]
-            }
+
+        chart1.coord('theta', {
+            radius: 0.75
         });
 
-        chart1.legend('heat', {title: "热量"});
-        chart1.interval().position('time*heat').size(35);
+        chart1.source(data1,{
+            'heat':{
+                alias:'热量'
+            },
+            'time': {
+                alias:"日期",
+                type: 'cat'
+            }
+        });
+        //chart1.legend(false);
+        chart1.tooltip(true,{showTitle:false});
+        chart1.intervalStack().position('percent').color('time').label('heat', {
+            formatter: function formatter(val, item) {
+                percent = (item.point.percent * 100).toFixed(2) + '%';
+                return item.point.time + ': ' + percent;
+            }
+        }).tooltip('time*heat', (time, heat) => {
+            return {
+                name: time,
+                value: heat+ 'MWH'
+            };
+        }).style({
+            lineWidth: 1,
+            stroke: '#fff'
+        });
         chart1.render();
 
         var data2 = [];
@@ -195,19 +212,34 @@
         var chart2 = new G2.Chart({
             container: 'c3',
             forceFit: true,
-            padding: 50,
             height: 500
         });
-        chart2.source(data2,{
-            "heat":{
-                alias:"热量"
-            },
-            "time":{
-                range:[0.09, 0.98]
-            }
+        chart2.coord('theta', {
+            radius: 0.75
         });
-
-        chart2.interval().position('time*heat').size(35);
+        chart2.source(data2,{
+            'heat':{
+                alias:'热量'
+            },'time': {
+                alias:"日期",
+                type: 'cat'
+        }
+        });
+        chart2.tooltip(true,{showTitle:false});
+        chart2.intervalStack().position('percent').color('time').label('heat', {
+            formatter: function formatter(val, item) {
+                percent = (item.point.percent * 100).toFixed(2) + '%';
+                return item.point.time + ': ' + percent;
+            }
+        }).tooltip('time*heat', (time, heat) => {
+            return {
+                name: time,
+                value: heat+ 'MWH'
+            };
+        }).style({
+            lineWidth: 1,
+            stroke: '#fff'
+        });
         chart2.render();
 
         var data3 = [];
@@ -236,8 +268,7 @@
             }
         });
         chart3.legend('heat', {title: "减少碳排放量"});
-        chart3.areaStack().position('time*heat').shape('smooth');
-        chart3.lineStack().position('time*heat').shape('smooth').size(2);
+        chart3.line().position('time*heat').size(2);
         chart3.render();
 
         heatLine();
@@ -294,26 +325,32 @@
                 $("#user1").html(firstItem.company);
                 //动态执行数据
                 $.getJSON(_ctx + '/admin/stat/user/heat/line', {userId: firstItem.id}, function (data) {
-                    chart1.changeData(data, {
-                        time: {
-                            type: 'linear',
-                            tickInterval: 50
-                        }
+
+                    const ds = new DataSet();
+                    const dv = ds.createView().source(data);
+                    dv.transform({
+                        type: 'percent',
+                        field: 'heat',
+                        dimension: 'time',
+                        as: 'percent'
                     });
+                    chart1.changeData(dv);
                 });
             }
-
             var secondItem  = users.shift();
             if(secondItem){
                 $("#user2").html(secondItem.company);
                 //动态执行数据
                 $.getJSON(_ctx + '/admin/stat/user/heat/line',{userId:secondItem.id}, function (data) {
-                    chart2.changeData(data, {
-                        time: {
-                            type: 'linear',
-                            tickInterval: 50
-                        }
+                    const ds = new DataSet();
+                    const dv = ds.createView().source(data);
+                    dv.transform({
+                        type: 'percent',
+                        field: 'heat',
+                        dimension: 'time',
+                        as: 'percent'
                     });
+                    chart2.changeData(dv);
                 });
             }
             users.push(firstItem,secondItem);
