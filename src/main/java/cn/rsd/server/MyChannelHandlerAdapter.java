@@ -92,7 +92,7 @@ public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
 //
 //            for(MeterDataReport meterDataReport1:list){
 //                meterDataReport1.setDataStr(printNumber1(meterDataReport1.getHexStr()));
-//
+//                meterDataReport1.setTableNumber(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(50, 58))),-1,""));
 //                this.meterDataReportMapper.updateByPrimaryKey(meterDataReport1);
 //            }
             ctx.close();
@@ -154,7 +154,7 @@ public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
         //sb.append(" ");
         //sb.append("仪表类型" + buf.substring(48, 50));
         //sb.append(" ");
-        sb.append("表号" + buf.substring(50, 58));
+        sb.append("表号" + concatPoint(reverse(splitStr(buf.substring(50, 58))),-1,""));
         sb.append(" ");
         sb.append("商代码" + buf.substring(58, 64));
         sb.append(" ");

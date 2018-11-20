@@ -165,6 +165,9 @@ public class OrderServiceImpl implements OrderService {
         buyerOrder.setTrucks(truck.getId());
         this.buyerOrderMapper.insertUseGeneratedKeys(buyerOrder);
 
+        //发送创建订单消息
+        
+
         Users adminUser = this.usersMapper.selectByPrimaryKey(supplyPosts.getAdminId());
 
         //查找司机信息

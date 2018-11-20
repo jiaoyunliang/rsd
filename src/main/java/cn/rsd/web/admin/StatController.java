@@ -90,6 +90,36 @@ public class StatController {
 
         return view;
     }
+    @RequestMapping("index4")
+    public ModelAndView index4(){
+        ModelAndView view = new ModelAndView("stat4");
+
+        Double heatSum = this.statMapper.selectSumAllNumber();
+        view.addObject("heatSum",heatSum);
+
+        Users users = new Users();
+        users.setRole(4);
+        List<Users> list = this.usersMapper.select(users);
+
+        view.addObject("users",list);
+
+        return view;
+    }
+    @RequestMapping("index3")
+    public ModelAndView index3(){
+        ModelAndView view = new ModelAndView("stat3");
+
+        Double heatSum = this.statMapper.selectSumAllNumber();
+        view.addObject("heatSum",heatSum);
+
+        Users users = new Users();
+        users.setRole(4);
+        List<Users> list = this.usersMapper.select(users);
+
+        view.addObject("users",list);
+
+        return view;
+    }
 
     @RequestMapping("heat/line")
     @ResponseBody
@@ -104,6 +134,30 @@ public class StatController {
         return list;
     }
 
+    @RequestMapping("heat/table/line")
+    @ResponseBody
+    public List<Map<String,Object>> heatTableLine(){
+        List<Map<String,Object>> list = null;
+        try{
+            list = this.statMapper.selectTableNumberMeterData(new Date());
+        }catch (Exception e){
+            logger.error(e,e);
+        }
+
+        return list;
+    }
+    @RequestMapping("heat/table/line1")
+    @ResponseBody
+    public List<Map<String,Object>> heatTableLine1(){
+        List<Map<String,Object>> list = null;
+        try{
+            list = this.statMapper.selectTableNumberMeterData1(new Date());
+        }catch (Exception e){
+            logger.error(e,e);
+        }
+
+        return list;
+    }
     @RequestMapping("co2/line")
     @ResponseBody
     public List<Map<String,Object>> co2Line(){
@@ -121,13 +175,15 @@ public class StatController {
     @ResponseBody
     public String heatALl(){
         Double heatSum = null;
-        NumberFormat format = NumberFormat.getCurrencyInstance();
+        NumberFormat format = NumberFormat.getInstance();
         try{
             heatSum = this.statMapper.selectSumAllNumber();
+
+
         }catch (Exception e){
             logger.error(e,e);
         }
-
+        format.setMaximumFractionDigits(2);
         return format.format(heatSum);
 
     }

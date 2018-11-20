@@ -16,6 +16,10 @@ import java.util.Map;
 public interface StatMapper extends BaseMapper<MeterDataReport>{
     List<Map<String,Object>> selectMeterData(Date now);
 
+    List<Map<String,Object>> selectTableNumberMeterData (Date now);
+
+    List<Map<String,Object>> selectTableNumberMeterData1 (Date now);
+
     List<Map<String,Object>> selectUserMeterData(Long userId);
 
     List<Map<String,Object>> selectCO2MeterData(Date now);

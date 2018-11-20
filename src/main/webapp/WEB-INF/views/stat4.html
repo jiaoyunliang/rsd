@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="no-js fixed-layout" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{stat_layout/layout}">
-<head th:include="stat_layout/layout :: htmlhead" th:with="title='热快送运营监控平台'">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{stat1_layout/layout}">
+<head th:include="stat1_layout/layout :: htmlhead" th:with="title='热快送运营监控平台'">
     <meta charset="utf-8">
     <title></title>
 </head>
@@ -67,7 +67,7 @@
                     <div class="num" id="allCOSum"></div>
                 </div>
                 <div class="cen-top" id="map"></div>
-                <div class="cen-bottom">
+                <div class="cen-bottom" style="width:50%;">
                     <div class="title" id="user1"></div>
                     <img src="../img/bj-1.png" th:src="@{/img/bj-1.png}" alt="" class="bj-1">
                     <img src="../img/bj-2.png" th:src="@{/img/bj-2.png}" alt="" class="bj-2">
@@ -75,21 +75,13 @@
                     <img src="../img/bj-4.png" th:src="@{/img/bj-4.png}" alt="" class="bj-4">
                     <div id="echarts_30"></div>
                 </div>
-                <div class="cen-bottom">
+                <div class="cen-bottom" style="width:50%;">
                     <div class="title" id="user2"></div>
                     <img src="../img/bj-1.png" th:src="@{/img/bj-1.png}" alt="" class="bj-1">
                     <img src="../img/bj-2.png" th:src="@{/img/bj-2.png}" alt="" class="bj-2">
                     <img src="../img/bj-3.png" th:src="@{/img/bj-3.png}" alt="" class="bj-3">
                     <img src="../img/bj-4.png" th:src="@{/img/bj-4.png}" alt="" class="bj-4">
                     <div id="echarts_31"></div>
-                </div>
-                <div class="cen-bottom" >
-                    <div class="title" id="user3"></div>
-                    <img src="../img/bj-1.png" th:src="@{/img/bj-1.png}" alt="" class="bj-1">
-                    <img src="../img/bj-2.png" th:src="@{/img/bj-2.png}" alt="" class="bj-2">
-                    <img src="../img/bj-3.png" th:src="@{/img/bj-3.png}" alt="" class="bj-3">
-                    <img src="../img/bj-4.png" th:src="@{/img/bj-4.png}" alt="" class="bj-4">
-                    <div id="echarts_32"></div>
                 </div>
             </div>
             <div class="con-right fr">
@@ -100,7 +92,7 @@
                     <img src="../img/bj-3.png" th:src="@{/img/bj-3.png}" alt="" class="bj-3">
                     <img src="../img/bj-4.png" th:src="@{/img/bj-4.png}" alt="" class="bj-4">
                     <div id="echarts_4" class="charts" style="text-align:center;">
-                        <iframe name="weather_inc" src="http://i.tianqi.com/index.php?c=code&id=64" width="540" height="291" allowtransparency="true" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+                        <iframe name="weather_inc" src="http://i.tianqi.com/index.php?c=code&id=64" width="440" height="260" allowtransparency="true" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
                     </div>
                 </div>
                 <div class="right-center">
@@ -111,7 +103,7 @@
                     <img src="../img/bj-4.png" th:src="@{/img/bj-4.png}" alt="" class="bj-4">
                     <div id="echarts_5" class="charts" style="color:#fff;text-align:center">
                         <table class="am-table am-table-compact am-text-nowrap tpl-table-black  dataTable no-footer"
-                               role="grid" style="width: 98%;font-size:16px;" width="94%" id="driver_table">
+                               role="grid" style="width: 98%;" width="94%" id="driver_table">
                             <thead>
                             <tr role="row">
                                 <th>车牌</th>
@@ -124,14 +116,14 @@
                     </div>
                 </div>
                 <div class="right-bottom">
-                    <div class="title" id="allFree"></div>
+                    <div class="title">个人总费用：<span id="allFree" style="float:left;color:rgb(252,199,217);"></span></div>
                     <img src="../img/bj-1.png" th:src="@{/img/bj-1.png}" alt="" class="bj-1">
                     <img src="../img/bj-2.png" th:src="@{/img/bj-2.png}" alt="" class="bj-2">
                     <img src="../img/bj-3.png" th:src="@{/img/bj-3.png}" alt="" class="bj-3">
                     <img src="../img/bj-4.png" th:src="@{/img/bj-4.png}" alt="" class="bj-4">
                     <div id="echarts_6" class="charts" style="color:#fff;text-align:center">
                         <table class="am-table am-table-compact am-text-nowrap tpl-table-black  dataTable no-footer"
-                               id="free_table" role="grid" style="width:98%;font-size:16px;" width="94%;">
+                               id="free_table" role="grid" style="width:98%;" width="94%">
                             <thead>
                             <tr role="row">
                                 <th>用户名称</th>
@@ -157,7 +149,7 @@
         <td>#{:=drivers[i].driverName}#</td>
         <td>#{:=drivers[i].plateNumber}#</td>
         <td>#{:=drivers[i].state}#</td>
-        #{if (drivers[i].route && drivers[i].state == '运送中'){}#
+        #{if (drivers[i].route){}#
         <td>#{:=drivers[i].route}#</td>
         #{}else{}#
         <td>瑞光电厂</td>
@@ -223,7 +215,7 @@
         chart.legend({
             position: 'right-center',
             textStyle:{
-                fontSize: '16'
+                fontSize: '20'
             }
         });
 
@@ -235,7 +227,7 @@
         var chart1 = new G2.Chart({
             container: 'c2',
             forceFit: true,
-            padding: [55,0,0,0],
+            padding: [30,0,0,0],
             height: 235
         });
         chart1.source(data1, {
@@ -262,7 +254,7 @@
         chart1.legend({
             position: 'top-center',
             textStyle:{
-                fontSize: '16'
+                fontSize: 14
             }
         });
         chart1.intervalStack().position('percent').color('tableNumber');
@@ -306,25 +298,6 @@
         datau2.interval().position('time*heat').color('heat').size(30);
         datau2.render();
 
-        var datau3 = new G2.Chart({
-            container: 'echarts_32',
-            forceFit: true,
-            padding: [10,0,50,50],
-            height: 220
-        });
-        datau3.source(data,{
-            "heat":{
-                alias:"热量"
-            },
-            "time":{
-                range:[0.05, 0.95]
-            }
-        });
-
-        datau3.legend('heat', {title: "热量"});
-        datau3.interval().position('time*heat').color('heat').size(30);
-        datau3.render();
-
         function heatLine() {
             $.getJSON(_ctx + '/admin/stat/heat/all', function (data) {
                 $("#allHeatSum").html(data);
@@ -361,7 +334,7 @@
             });
 
             //动态执行数据
-            $.getJSON(_ctx + '/admin/stat/heat/table/line', function (data) {
+            $.getJSON(_ctx + '/admin/stat/heat/table/line1', function (data) {
                 const ds = new DataSet();
                 const dv = ds.createView().source(data);
                 dv.transform({
@@ -371,14 +344,12 @@
                         return row;
                     }
                 }).transform({
-                    type: 'filter',
-                    callback(row) {
-                        return row.heat > 0;
-                    }
+                    type: 'partition',
+                    groupBy: [ 'tableNumber' ]
                 }).transform({
                     type: 'percent',
                     field: 'heat',
-                    dimension: 'tableNumber',
+                    dimension: 'year',
                     as: 'percent'
                 });
                 chart1.changeData(dv);
@@ -403,26 +374,11 @@
                     datau2.changeData(data);
                 });
             }
-
-            var secondItem1 = users.shift();
-            if (secondItem1) {
-                $("#user3").html(secondItem1.company);
-                //动态执行数据
-                $.getJSON(_ctx + '/admin/stat/user/heat/line', {userId: secondItem1.id}, function (data) {
-                    datau3.changeData(data);
-                });
-            }
-            users.push(firstItem, secondItem, secondItem1);
+            users.push(firstItem, secondItem);
         }
 
-        function weather() {
-            $.getJSON('http://wthrcdn.etouch.cn/weather_mini?city=北京市',{}, function (data) {
-                console.log(data);
-            });
-
-        }
         function userTable() {
-            weather();
+
             //动态执行数据
             $.getJSON(_ctx + '/admin/stat/driver', function (data) {
                 template.config({sTag:"#{",eTag:"}#",compress: true});
@@ -441,7 +397,7 @@
                     allFree+= 0+  parseFloat(data[i].allPrice.replace(",",""));
                 }
 
-                $("#allFree").html("<p style='color:rgb(252,199,217);'>个人总费用："+allFree+"(元)</p>");
+                $("#allFree").html(allFree);
                 $('#free_table tbody').remove();
                 $('#free_table').append(template(tpl,{'free':data}));
             });

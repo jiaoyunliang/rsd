@@ -22,6 +22,46 @@
               GROUP BY time
 
        </select>
+
+    <select id="selectTableNumberMeterData" resultType="java.util.HashMap">
+        SELECT
+            DATE_FORMAT(t.run_date, '%Y-%m-%d') AS time,
+            t.table_number tableNumber,
+            MAX(IFNULL(t.aggregate_heat, 0)) - IFNULL((SELECT
+                            MAX(tt.aggregate_heat)
+                        FROM
+                            meter_data_report tt
+                        WHERE
+                            DATE_FORMAT(tt.run_date, '%Y-%m-%d') = DATE_FORMAT(DATE_SUB(t.run_date, INTERVAL 1 DAY),
+                                    '%Y-%m-%d')
+                                AND tt.table_number = t.table_number),
+                    0) AS heat
+        FROM
+            meter_data_report t
+        GROUP BY t.table_number
+    </select>
+
+    <select id="selectTableNumberMeterData1" resultType="java.util.HashMap">
+        SELECT
+        time,table_number tableNumber, SUM(heat) heat
+        FROM
+        (SELECT
+        DATE_FORMAT(t.run_date, '%Y-%m-%d') AS time,
+        t.table_number,
+        MAX(IFNULL(t.aggregate_heat, 0)) - IFNULL((SELECT
+        MAX(tt.aggregate_heat)
+        FROM
+        meter_data_report tt
+        WHERE
+        DATE_FORMAT(tt.run_date, '%Y-%m-%d') = DATE_FORMAT(DATE_SUB(t.run_date, INTERVAL 1 DAY), '%Y-%m-%d')
+        AND tt.table_number = t.table_number), 0) AS heat
+        FROM
+        meter_data_report t
+        WHERE
+        DATE_SUB(CURDATE(), INTERVAL 6 DAY) <![CDATA[  <=]]>  t.run_date
+        GROUP BY DATE_FORMAT(t.run_date, '%Y-%m-%d') , t.table_number) b
+        GROUP BY time
+    </select>
        <select id="selectCO2MeterData" resultType="java.util.HashMap">
               SELECT
               time, SUM(heat*278*0.785) heat
@@ -82,7 +122,7 @@
             a.company driverName,
             b.plate_number plateNumber,
             b.state state,
-            (select t.buyer from buyer_order t where t.distribution = a.id and t.state in (3,4,5) order by t.update_date desc LIMIT 1) buyer
+            (select t.buyer from buyer_order t where t.distribution = a.id and t.state in (3,4,5,6,7) order by t.update_date desc LIMIT 1) buyer
         FROM
             users a
             inner JOIN
