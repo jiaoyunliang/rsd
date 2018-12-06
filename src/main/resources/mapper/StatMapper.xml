@@ -38,6 +38,11 @@
                     0) AS heat
         FROM
             meter_data_report t
+            <where>
+                <if test="now != null">
+                    DATE_FORMAT(t.run_date, '%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')
+                </if>
+            </where>
         GROUP BY t.table_number
     </select>
 
@@ -122,12 +127,12 @@
             a.company driverName,
             b.plate_number plateNumber,
             b.state state,
+            b.update_date updateDate,
             (select t.buyer from buyer_order t where t.distribution = a.id and t.state in (3,4,5,6,7) order by t.update_date desc LIMIT 1) buyer
         FROM
             users a
             inner JOIN
             trucks b ON a.id = b.user_id
-
         WHERE
             a.role = 3
     </select>
@@ -165,5 +170,35 @@
             a.role = 4
         GROUP BY b.buyer
 
+    </select>
+    <select id="selectTableHeat" resultType="java.util.HashMap">
+        SELECT
+        run_date runDate, aggregate_heat heat
+        FROM
+        (SELECT
+        run_date,
+        SUM(aggregate_heat - IFNULL((SELECT
+        MAX(tt.aggregate_heat)
+        FROM
+        meter_data_report tt
+        WHERE
+        DATE_FORMAT(tt.run_date, '%Y-%m-%d') <![CDATA[<=]]> DATE_FORMAT(DATE_SUB(t1.run_date, INTERVAL 1 DAY), '%Y-%m-%d')
+        AND tt.table_number = t1.table_number), 0)) aggregate_heat
+        FROM
+        (SELECT
+        DATE_FORMAT(run_date, '%Y-%m-%d') run_date,
+        table_number,
+        MAX(IFNULL(aggregate_heat, 0)) aggregate_heat
+        FROM
+        meter_data_report
+        WHERE
+        run_date <![CDATA[ >= ]]> #{startDate}
+        AND run_date <![CDATA[  <= ]]> #{endDate}
+        AND table_number IN
+        <foreach collection="tables" item="table" index="index" open="(" close=")" separator=",">
+            #{table.tableNumber}
+        </foreach>
+        GROUP BY DATE_FORMAT(run_date, '%Y-%m-%d') , table_number) t1
+        GROUP BY run_date) t
     </select>
 </mapper>

@@ -20,6 +20,7 @@ import com.github.wxpay.sdk.WXPayUtil;
 import org.apache.http.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -230,6 +231,13 @@ public class WeiXinController {
     public ReturnMessage jsconfig(String pageurl) throws UnsupportedEncodingException {
         ReturnMessage message = ReturnMessage.buildMessage();
         message.setData(Sign.sign(appId,accessTokenServie.getJsApiTicket(), URLDecoder.decode(pageurl,"UTF-8")));
+
+        String account = "lmj";
+        String pass = "159357";
+        String time = DateTime.now().toString("yyyy-MM-dd HH:mm:ss");
+
+        message.putData("mapkey",Sign.MD5(account+Sign.MD5(pass).toLowerCase()+time).substring(8,24).toLowerCase());
+        message.putData("maptime",time);
         return message;
     }
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.rsd.dao.MeterDataReportMapper">
+       <select id="selectTabelMaxSeq" resultType="int">
+        SELECT
+            IFNULL(MAX(report_seq), 0) report_seq
+        FROM
+            meter_data_report
+        WHERE
+            table_number = #{tableNumber}
+
+       </select>
+
+    <select id="selectTabelAggregateHeat" resultType="cn.rsd.po.MeterDataReport">
+        SELECT
+            *
+        FROM
+            meter_data_report t
+        WHERE
+            t.table_number = #{tableNumber}
+        ORDER BY report_date DESC
+        LIMIT 1
+    </select>
+</mapper>

@@ -79,6 +79,7 @@ public class OrderServiceImpl implements OrderService {
         oldTruck.setUserId(oldDriver.getId());
         oldTruck = this.trucksMapper.selectOne(oldTruck);
         oldTruck.setState(5);
+        oldTruck.setUpdateDate(new Date());
         this.trucksMapper.updateByPrimaryKey(oldTruck);
 
         buyerOrder.setDistribution(driver.getId());
@@ -97,6 +98,7 @@ public class OrderServiceImpl implements OrderService {
 
         //锁定车辆
         truck.setState(4);
+        truck.setUpdateDate(new Date());
         this.trucksMapper.updateByPrimaryKey(truck);
 
         OrderStateLog stateLog = new OrderStateLog();
@@ -151,6 +153,7 @@ public class OrderServiceImpl implements OrderService {
 
         //锁定车辆
         truck.setState(4);
+        truck.setUpdateDate(new Date());
         this.trucksMapper.updateByPrimaryKey(truck);
 
         //更新供热点下一个可派的车辆
@@ -288,6 +291,7 @@ public class OrderServiceImpl implements OrderService {
             truck = this.trucksMapper.selectOne(truck);
 
             truck.setState(5);
+            truck.setUpdateDate(new Date());
             this.trucksMapper.updateByPrimaryKey(truck);
         }
 

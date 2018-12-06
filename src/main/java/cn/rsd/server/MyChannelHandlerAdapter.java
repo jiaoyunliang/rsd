@@ -1,6 +1,8 @@
 package cn.rsd.server;
 
+import cn.rsd.dao.MeterDataMapper;
 import cn.rsd.dao.MeterDataReportMapper;
+import cn.rsd.po.MeterData;
 import cn.rsd.po.MeterDataReport;
 import cn.rsd.util.DataConverter;
 import io.netty.buffer.ByteBuf;
@@ -14,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author 焦云亮
@@ -29,6 +34,9 @@ public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
 
     @Autowired
     private MeterDataReportMapper meterDataReportMapper;
+
+    @Autowired
+    private MeterDataMapper meterDataMapper;
 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
@@ -64,15 +72,34 @@ public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
             buf.readBytes(bytes);
             String dataStr = printNumber1(meterDataReport.getHexStr());
 
-            meterDataReport.setDataStr(dataStr);
+            DateTimeFormatter f = DateTimeFormat.forPattern("yyyyMMddHHmmss");
+            StringBuffer sb = new StringBuffer();
+            sb.append(f.parseLocalDateTime(concatPoint(reverse(splitStr(meterDataReport.getHexStr().substring(142, 156))), -1, "")).toString("yyyy-MM-dd HH:mm:ss"));
+
             try {
-                meterDataReport.setRunDate(DateTime.parse(dataStr.substring(118,137),DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate());
-                meterDataReport.setTableNumber(dataStr.substring(2, 10));
-                meterDataReport.setAggregateHeat(new Double(dataStr.substring(32, 41)));
+                meterDataReport.setRunDate(DateTime.parse(sb.toString(),DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate());
+                meterDataReport.setTableNumber(concatPoint(reverse(splitStr(meterDataReport.getHexStr().substring(50, 58))),-1,""));
+                //meterDataReport.setTableName(tables.get(concatPoint(reverse(splitStr(meterDataReport.getHexStr().substring(50, 58))),-1,"")));
+                meterDataReport.setAggregateHeat(new Double(concatPoint(reverse(splitStr(meterDataReport.getHexStr().substring(84, 92))), 2, ".")));
             }catch (Exception e){
                 e.printStackTrace();
             }
+
             meterDataReport.setReportDate(new Date());
+//
+            MeterData meterData = new MeterData();
+            meterData.setTableNumber(meterDataReport.getTableNumber());
+            meterData = this.meterDataMapper.selectOne(meterData);
+            if(meterData != null) {
+                meterDataReport.setTableName(meterData.getTableName());
+                dataStr = dataStr.replaceAll("表号"+meterData.getTableNumber(),"表号"+meterData.getTableName());
+
+                meterDataReport.setDataStr(dataStr);
+            }
+
+            int maxSeq = this.meterDataReportMapper.selectTabelMaxSeq(meterDataReport.getTableNumber());
+
+            meterDataReport.setReportSeq(maxSeq+1);
             this.meterDataReportMapper.insert(meterDataReport);
 
 //            buf.readBytes(bytes);
@@ -88,13 +115,28 @@ public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
 //            printNumber(buf);
 
 //
-//            List<MeterDataReport> list = this.meterDataReportMapper.selectAll();
-//
-//            for(MeterDataReport meterDataReport1:list){
-//                meterDataReport1.setDataStr(printNumber1(meterDataReport1.getHexStr()));
-//                meterDataReport1.setTableNumber(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(50, 58))),-1,""));
-//                this.meterDataReportMapper.updateByPrimaryKey(meterDataReport1);
-//            }
+
+            if(meterDataReport.getTableNumber().equals("18082701")) {
+
+                List<MeterDataReport> list = this.meterDataReportMapper.selectAll();
+
+                for (MeterDataReport meterDataReport1 : list) {
+
+                    MeterData meterData1 = new MeterData();
+                    meterData1.setTableNumber(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(50, 58))), -1, ""));
+                    meterData1 = this.meterDataMapper.selectOne(meterData1);
+
+                    if(meterData1 != null) {
+                        meterDataReport1.setTableName(meterData1.getTableName());
+                        meterDataReport1.setTableNumber(meterData1.getTableNumber());
+                    }
+
+                    meterDataReport1.setRunDate(DateTime.parse(f.parseLocalDateTime(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(142, 156))), -1, "")).toString("yyyy-MM-dd HH:mm:ss"), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate());
+
+                    meterDataReport1.setAggregateHeat(new Double(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(84, 92))), 2, ".")));
+                    this.meterDataReportMapper.updateByPrimaryKey(meterDataReport1);
+                }
+            }
             ctx.close();
 
         } finally {
@@ -133,6 +175,38 @@ public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
         System.out.println(DateTime.parse(str1.substring(118,137),DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
     }
 
+    private static Map<String,String> tables = new HashMap<>();
+
+    static {
+        tables.put("18439062","1号表");
+        tables.put("18439077","2号表");
+        tables.put("18439087","3号表");
+        tables.put("18439072","4号表");
+        tables.put("18439083","5号表");
+        tables.put("18439067","6号表");
+        tables.put("18439075","7号表");
+        tables.put("18439070","8号表");
+        tables.put("18439082","9号表");
+        tables.put("18439061","10号表");
+        tables.put("18439069","11号表");
+        tables.put("18439074","12号表");
+        tables.put("18439079","13号表");
+        tables.put("18439080","14号表");
+        tables.put("18439085","15号表");
+        tables.put("18439089","16号表");
+        tables.put("18439088","17号表");
+        tables.put("18439084","18号表");
+        tables.put("18439071","19号表");
+        tables.put("18439073","20号表");
+        tables.put("18082701","测试表号");
+
+        tables.put("18439063","晨辉");
+        tables.put("18439066","金世纪");
+        tables.put("18439064","沃尔沃");
+        tables.put("18439081","展厅");
+
+    }
+
     /**
      * 将一个int数字转换为二进制的字符串形式。
      *
@@ -156,12 +230,12 @@ public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
         //sb.append(" ");
         sb.append("表号" + concatPoint(reverse(splitStr(buf.substring(50, 58))),-1,""));
         sb.append(" ");
-        sb.append("商代码" + buf.substring(58, 64));
-        sb.append(" ");
+        //sb.append("商代码" + buf.substring(58, 64));
+       //sb.append(" ");
         //sb.append("控制字" + buf.substring(64, 66));
         //sb.append(" ");
-        sb.append("数据长度" + buf.substring(66, 68));
-        sb.append(" ");
+        //sb.append("数据长度" + buf.substring(66, 68));
+        //sb.append(" ");
         //sb.append("数据标识" + buf.substring(68, 72));
         //sb.append(" ");
         //sb.append("序列号" + buf.substring(72, 74));
@@ -195,10 +269,10 @@ public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
 
         //sb.append("运行时间" + concatPoint(reverse(splitStr(buf.substring(136, 140))),-1)+unit(buf.substring(140,142)));
         //sb.append(" ");
-        DateTimeFormatter f = DateTimeFormat.forPattern("yyyyMMddHHmmss");
-
-        sb.append("实时时间" + f.parseLocalDateTime(concatPoint(reverse(splitStr(buf.substring(142, 156))), -1, "")).toString("yyyy-MM-dd HH:mm:ss"));
-        sb.append(" ");
+//        DateTimeFormatter f = DateTimeFormat.forPattern("yyyyMMddHHmmss");
+//
+////        sb.append("实时时间" + f.parseLocalDateTime(concatPoint(reverse(splitStr(buf.substring(142, 156))), -1, "")).toString("yyyy-MM-dd HH:mm:ss"));
+////        sb.append(" ");
 
         long stateBit = 0x0000010000000111L;
 

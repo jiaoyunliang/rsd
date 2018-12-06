@@ -1,0 +1,74 @@
+@charset "utf-8";
+/* 公用样式 */
+body,html{padding:0;margin:0;font:14px/22px PingFangSC-Regular,Microsoft YaHei,Arial,Helvetica,sans-serif;color:#424B54;background:#001034;-webkit-text-size-adjust:none;}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td {padding: 0;margin: 0;}
+em,i{font-style:normal;}
+img {
+  height: auto;
+  vertical-align: middle;
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+}
+/* 主体部分 */
+.main-table{color:#fff;width:4800px;height:1200px;font-size: 12px;background:#001034 url(../images/bg.png) top left no-repeat;background-size: 1544px 639px;}
+
+/* logo+电厂取热得效果图 */
+.main-left-table{width:1365px;height:1200px;border-right:1px solid #0a306c;float: left;}
+.logo-table{padding-top: 66px;padding-left: 100px;}
+.logo-left{background:url(../images/logo.png) no-repeat;width: 358px;height: 110px;float: left;display: block;}
+.logo-right{color: #fff;font-size: 30px;margin-left: 25px;margin-top: 20px;display: inline-block;height: 19px;}
+.logo-right em{color: #fff;font-size: 30px;margin-top: 20px;display: inline-block;height: 19px;}
+.pic-style-table{margin-top: 117px;padding-left: 100px;}
+.pic-style-table-line1{text-align: center;font-size: 30px;color: #aeceff;}
+.pic-style-table-line2{text-align: center;font-size: 30px;color: #aeceff;margin-top: 15px;}
+.icon{background:url(../images/icon.png) no-repeat;width: 17px;height: 19px;padding-right: 9px;display: inline-block;position: relative;top:2px;}
+.font-hot{font-size: 18px;color: #5899c2;}
+.pic-style-table-line3{margin-top: 64px;}
+.pic-style-table-line3 div{width: 55px;height: 510px;padding-right: 3px;float: left;position: relative;}
+.icon1{background:url(../images/icon.png) no-repeat;width: 17px;height: 19px;position: absolute;top:75px;right: 0;}
+.num{width: 17px;position: absolute;top:102px;right: -2px;color: #fff;font-size: 12px;writing-mode:tb-rl;}
+.pic-style-table-line4{clear: both;}
+.sl-mid{float: left;background:url(../images/sl-bg.png) repeat-x center center;width: 58px;height: 41px;display:inline-block;}
+.sl-leadr{float: left;background:url(../images/sl-leadr.png) no-repeat center center;width: 58px;height: 41px;display:inline-block;}
+.sl-end{float: left;background:url(../images/sl-end.png) no-repeat left center;width: 58px;height: 41px;display: inline-block;margin-left: -7px;}
+.pic-style-table-line5{width:1170px;clear:both;background:url(../images/sl-bottom.png) no-repeat center center;top: -3px;height: 184px;position: relative;}
+
+/* 用户行业比例 */
+.user-table{width: 915px;height:1200px;border-right:1px solid #0a306c;float: left;}
+.user-pic-line1{padding-left: 177px;padding-right: 79px;padding-top: 55px;color: #aeceff;font-size: 30px;}
+.user-pic-line2{margin-left: 102px;margin-right: 79px;margin-top: 90px;padding-bottom: 68px;text-align: center;border-bottom:1px solid #0a306c; }
+.user-pic-line3{margin-left: 102px;margin-right: 79px;margin-top: 126px;text-align: center;}
+
+/* 用户所在位置得坐标和移动供热车得位置展示 */
+.location-table{width: 1367px;height:1200px;border-right:1px solid #0a306c;float: left;}
+.location-table-line1{padding: 63px 0 73px 94px;border-bottom:1px solid #0a306c;overflow: hidden;}
+.tan{width: 423px;float: left;}
+.tan-font{font-size: 30px;color: #cc405d;}
+.tan-font em{margin-right: 10px;background:url(../images/icon01.png) no-repeat;width: 33px;height: 32px;display: inline-block;position: relative;top:5px;}
+.tan-font-num{font-size: 55px;color: #fff;margin-top: 27px;}
+.zon{width: 423px;float: left;}
+.zon-font{font-size: 30px;color: #d4af19;}
+.zon-font em{margin-right: 10px;background:url(../images/icon02.png) no-repeat;width: 22px;height: 30px;display: inline-block;position: relative;top:5px;}
+.zon-font-num{font-size: 55px;color: #fff;margin-top: 27px;}
+.shui{width: 423px;float: left;}
+.shui-font{font-size: 30px;color: #13c2c2;}
+.shui-font em{margin-right: 10px;background:url(../images/icon03.png) no-repeat;width: 24px;height: 31px;display: inline-block;position: relative;top:5px;}
+.shui-font-num{font-size: 55px;color: #fff;margin-top: 27px;}
+.location-table-line2{margin-top: 15px;margin-left:132px;background:url(../images/loc-bg.png) no-repeat center center;width: 1082px;height: 938px;text-align: center;}
+.map-font{color: #aeceff;font-size: 30px;padding-top: 50px;}
+.map{padding-top: 128px;}
+
+/* 取热与供热对比图 */
+.db-table{float: left;}
+.db-line1{text-align: center;border-bottom:1px solid #0a306c;padding: 60px 0 69px 0;overflow: hidden;width: 947px;margin-left: 102px;margin-right: 99px;}
+.db-line1-title{color: #aeceff;font-size: 30px;}
+.db-line1-top{margin-top: 56px;}
+.db-line2{margin: 52px 0 60px;font-size: 30px;color: #aeceff;text-align: center;}
+.detailed-table table{width:948px;border-spacing:separate;border-spacing:0px;margin-left: 102px;margin-right: 99px;}
+.detailed-table table thead{background: #021c60;text-align: left;font-size: 14px;padding: 10px 0;}
+.detailed-table table tbody tr td{font-size: 14px;text-align: left;height: 44px;line-height:44px;padding-left: 27px;}
+.detailed-table table thead tr th{height: 55px;line-height:55px;color: #aeceff;font-size: 18px;font-weight: normal;padding-left: 27px;}
+.shen td{background: #021c60;border-bottom:1px solid #001034;}
+.qian{background: #00164d;}
+
+

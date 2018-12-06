@@ -1,6 +1,6 @@
 <!doctype html>
 <html class="no-js fixed-layout" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layout}">
-<head th:include="layout/layout :: htmlhead" th:with="title='车辆管理'">
+<head th:include="layout/layout :: htmlhead" th:with="title='计量表管理'">
   <meta charset="utf-8">
   <title></title>
 </head>
@@ -12,7 +12,7 @@
         <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
           <div class="widget am-cf">
             <div class="widget-head am-cf">
-              <div class="widget-title  am-cf">车辆管理</div>
+              <div class="widget-title  am-cf">计量表管理</div>
             </div>
             <div class="widget-body  am-fr">
               <div class="am-u-sm-12 am-u-md-6 am-u-lg-6">
@@ -29,7 +29,7 @@
                 <form id="searchFrm" onsubmit="return false;" class="am-form">
                   <div class="am-u-md-6 am-u-lg-3">
                     <div class="am-form-group">
-                      <input type="text" id="plateNumber" class="am-form-field am-input-sm" name="plateNumber" placeholder="请输入车牌号">
+                      <input type="text" id="tableName" class="am-form-field am-input-sm" name="tableName" placeholder="请输入表名称">
                     </div>
                   </div>
                   <div class="am-u-md-6 am-u-lg-3 am-u-end">
@@ -46,10 +46,10 @@
                 <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black am-text-nowrap" id="example-r">
                   <thead>
                   <tr>
-                    <th>车牌号</th>
-                    <th>供热点</th>
-                    <th>司机</th>
-                    <th>状态</th>
+                    <th>表编号</th>
+                    <th>表名称</th>
+                    <th>类型</th>
+                    <th>行业</th>
                     <th>操作</th>
                   </tr>
                   </thead>
@@ -75,18 +75,17 @@
       </div>
     </div>
   </div>
-  <th:block th:replace="form/trucks :: html"></th:block>
+  <th:block th:replace="form/meter :: html"></th:block>
 </th:block>
 </body>
 </html>
 <script type="text/javascript" th:inline="javascript">
   /*<![CDATA[*/
 
-  var drivers = [[${drivers}]]||[];
-  var supplyPosts = [[${supplyPosts}]]||[];
+  var userTypes = [[${userTypes}]]||[];
+  var industryCategoryList = [[${industryCategoryList}]]||[];
 
   /*]]>*/
-
   var _ctx = $("meta[name='ctx']").attr("content");
 
   if(!_ctx){
@@ -95,7 +94,7 @@
   $(document).ready(function(){
     $('#example-r').DataTable({
       ajax: {
-        url:_ctx+"/admin/trucks/list",
+        url:_ctx+"/admin/meter/list",
         type: "POST",
         dataType : 'json',
         data:function (d) {
@@ -110,55 +109,23 @@
       serverSide: true,
       lengthChange:false,
       columns: [
-        {data: "plateNumber" },
-        {data: "supplyId" ,render:function (data) {
-            var val = supplyPosts.filter(function (item) {
-              return item.id == data;
-            })[0];
+        {data: "tableNumber" },
+        {data: "tableName" },
+        {data: "userType",render:function (data) {
+          var val = userTypes.filter(function (item) {
+            return item.val == data;
+          })[0];
 
-            if(val){
-              return val.supplyName||"";
-            }else{
-              return "";
-            }
-        }},
-        {data: "userId" ,render:function (data) {
-            var val = drivers.filter(function (item) {
-              return item.id == data;
-            })[0];
-
-            if(val){
-              return val.company||"";
-            }else{
-              return "";
-            }
-        }},
-        {data: "state" ,render :function(data){
-          var state = "";
-          switch (data){
-            case 1:
-              state = "储热完成";
-              break;
-            case 2:
-              state = "修理";
-              break;
-            case 3:
-              state = "停运";
-              break;
-            case 4:
-              state = "运送中";
-              break;
-            case 5:
-              state = "储热中";
-              break;
+          if(val){
+            return val.text||"";
+          }else{
+            return "";
           }
-          return state;
         }},
+        {data: "industryCategory"},
         {data: null,render :function () {
           var btnHtml =   '<div class="tpl-table-black-operation">'
                   +'<a href="javascript:;" id="edit"><i class="am-icon-pencil"></i> 编辑</a> '
-                  +'<a href="javascript:;" id="outage"><i class="am-icon-stop-circle"></i>停运</a> '
-                  +'<a href="javascript:;" id="normal"><i class="am-icon-cogs"></i>正常</a> '
                   +'</div>';
           return btnHtml;
         }}
@@ -183,39 +150,7 @@
         }
       });
     });
-    $('#example-r tbody').on( 'click', 'a#normal', function () {
-      var tr = $(this).parents('tr');
-      var data = $('#example-r').DataTable().row(tr).data();
-      $.ajax({
-        type: 'post',
-        url: _ctx + '/admin/trucks/normal',
-        data: {id:data.id},
-        dataType : 'json',
-        success: function (data) {
-          if (data.code == 200) {
-            search();
-          }
-        }
-      });
-    });
-    /**
-     * 查看修改
-     */
-    $('#example-r tbody').on( 'click', 'a#outage', function () {
-      var tr = $(this).parents('tr');
-      var data = $('#example-r').DataTable().row(tr).data();
-      $.ajax({
-        type: 'post',
-        url: _ctx + '/admin/trucks/repair',
-        data: {id:data.id},
-        dataType : 'json',
-        success: function (data) {
-          if (data.code == 200) {
-            search();
-          }
-        }
-      });
-    });
+
     /**
      * 查看修改
      */
@@ -224,29 +159,7 @@
       var data = $('#example-r').DataTable().row(tr).data();
       fillFrm(data,"#frm-employee");
     });
-    /**
-     * 删除
-     */
-    $('#example-r tbody').on( 'click', 'a#del', function () {
-      var tr = $(this).parents('tr');
-      var data = $('#example-r').DataTable().row(tr).data();
-      $('#my-confirm').modal({
-        relatedTarget: this,
-        onConfirm: function(options) {
-          $.ajax({
-            type: 'post',
-            url: _ctx + '/employee/del',
-            data: {id:data.id},
-            dataType : 'json',
-            success: function (data) {
-              if (data.code == 200) {
-                search();
-              }
-            }
-          });
-        }
-      });
-    });
+
   });
 
   function search(){

@@ -22,6 +22,7 @@
     <security:http pattern="/500" security="none"/>
     <security:http pattern="/css" security="none"/>
     <security:http pattern="/img" security="none"/>
+    <security:http pattern="/images" security="none"/>
     <security:http pattern="/fonts" security="none"/>
     <security:http pattern="/i/examples" security="none"/>
     <security:http pattern="/js" security="none"/>

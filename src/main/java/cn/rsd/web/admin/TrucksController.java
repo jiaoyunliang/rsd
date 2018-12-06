@@ -76,6 +76,7 @@ public class TrucksController {
 
         try{
             if(trucks.getId() == null) {
+                trucks.setState(Trucks.TrucksStateEnum.HEAT_STORAGE.value());
                 this.trucksMapper.insert(trucks);
             }else{
                 this.trucksMapper.updateByPrimaryKey(trucks);

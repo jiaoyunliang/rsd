@@ -49,6 +49,6 @@ public class Page<T> extends PageRowBounds{
         if(length > 200){
             length = DEFAULT_PAGE_SIZE;
         }
-        return new Page(start*length,length);
+        return new Page(start,length);
     }
 }

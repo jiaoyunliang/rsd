@@ -1,0 +1,29 @@
+<!doctype html>
+<html class="js cssanimations" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:fragment="htmlhead">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><!--/*@thymesVar id="title" type=""*/--><th:block th:text="${title}"></th:block></title>
+    <meta name="ctx" th:content="${#httpServletRequest.getContextPath()}" />
+    <meta name="description" content="晋中热快送能源有限公司">
+    <meta name="keywords" content="stat">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link type="text/css" rel="stylesheet" href="../css/style.css" th:href="@{/css/style.css}"/>
+    <script src="../js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+    <script src="../js/template.js" th:src="@{/js/template.js}"></script>
+</head>
+<body class="theme-black">
+<!--[if lte IE 9]>
+<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
+    以获得更好的体验！</p>
+<![endif]-->
+<!-- content start -->
+<div layout:fragment="content"></div>
+<!-- content end -->
+<script>/*Fixing iframe window.innerHeight 0 issue in Safari*/document.body.clientHeight;</script>
+<script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g2-3.3.2/dist/g2.min.js"></script>
+<script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.9.6/dist/data-set.min.js"></script>
+</body>
+</html>

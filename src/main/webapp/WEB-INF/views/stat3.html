@@ -199,7 +199,7 @@
         var chart = new G2.Chart({
             container: 'c1',
             forceFit: true,
-            padding: [0,130,0,0],
+            padding: [10,280,10,0],
             height: 235
         });
         chart.source(data, {
@@ -342,14 +342,14 @@
 
             });
             //动态执行数据
-            $.getJSON(_ctx + '/admin/stat/heat/table/line', function (data) {
+            $.getJSON(_ctx + '/admin/stat/heat/table/line1', function (data) {
 
                 const ds = new DataSet();
                 const dv = ds.createView().source(data);
                 dv.transform({
                     type: 'filter',
                     callback(row) {
-                        return row.time == formatDate(new Date());
+                        return row.time == formatDate(new Date()) && row.heat > 0 && row.tableNumber;
                     }
                 }).transform({
                     type: 'percent',
@@ -373,7 +373,7 @@
                 }).transform({
                     type: 'filter',
                     callback(row) {
-                        return row.heat > 0;
+                        return row.heat > 0  && row.tableNumber;
                     }
                 }).transform({
                     type: 'percent',

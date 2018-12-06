@@ -25,6 +25,26 @@ public class MeterDataReport extends BasePo {
 
     private String tableNumber;
 
+    private Integer reportSeq;
+
+    private String tableName;
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public Integer getReportSeq() {
+        return reportSeq;
+    }
+
+    public void setReportSeq(Integer reportSeq) {
+        this.reportSeq = reportSeq;
+    }
+
     public String getTableNumber() {
         return tableNumber;
     }

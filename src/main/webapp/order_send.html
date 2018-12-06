@@ -83,7 +83,7 @@
                 var tabLoadEnd = $('.aui-order-title').eq(itemIndex).data("tabLoadEnd")||false;
 
                 //console.log(num);
-                $.post("order/list",{length:20,start:num,rnd:Math.random(),state:state},function(json){
+                $.post("order/list",{length:20,start:num * 20,rnd:Math.random(),state:state},function(json){
                     num++;
                     $('.aui-order-title').eq(itemIndex).data("pageNum",num);
                     if(json.data.data){

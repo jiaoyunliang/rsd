@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html class="no-js fixed-layout" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{new_stat_layout/layout}">
+<head th:include="new_stat_layout/layout :: htmlhead" th:with="title='热快送运营监控平台'">
+    <meta charset="utf-8">
+    <title></title>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <!--内容区域开始-->
+    <div class="main-table">
+        <!--内容区域logo+电厂取热得效果图开始-->
+        <div class="main-left-table">
+            <div class="logo-table">
+                <div class="logo-left">&nbsp;</div>
+                <div class="logo-right">智慧能源<br/><em>监控系统</em></div>
+            </div>
+            <div class="pic-style-table">
+                <div class="pic-style-table-line1">电厂取热得效果图</div>
+                <div class="pic-style-table-line2"><em class="icon"></em><em class="font-hot">累计热量</em></div>
+                <div class="pic-style-table-line3" id="meterDiv">
+                    <div th:each="meter,meterStat : ${meterDataList}">
+                        <img th:id="${meter.tableNumber}" src="/images/pic4.png" width="55" height="510"><em class="icon1">&nbsp;</em><em class="num" th:id="${'meter'+meterStat.index}"></em>
+                    </div>
+                </div>
+                <div class="pic-style-table-line4">
+                    <div class="sl-leadr">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-mid">&nbsp;</div>
+                    <div class="sl-end">&nbsp;</div>
+                </div>
+                <div class="pic-style-table-line5">&nbsp;</div>
+            </div>
+
+        </div>
+        <!--内容区域logo+电厂取热得效果图开始-->
+        <!--内容区域用户行业比例开始-->
+        <div class="user-table">
+            <div class="user-pic-line1">用户行业比例</div>
+            <div class="user-pic-line2">
+                <div id="pic1">
+                </div>
+
+            </div>
+            <div class="user-pic-line3">
+                <div id="mountNode"></div>
+            </div>
+        </div>
+        <!--内容区域用户行业比例结束-->
+        <!--内容区域用户所在位置得坐标和移动供热车得位置展示开始-->
+        <div class="location-table">
+            <div class="location-table-line1">
+                <div class="tan">
+                    <div class="tan-font"><em></em>碳减排总计</div>
+                    <div class="tan-font-num" id="allCOSum"></div>
+                </div>
+                <div class="zon">
+                    <div class="zon-font"><em></em>总取热量</div>
+                    <div class="zon-font-num" th:text="${heatSum}" id="allHeatSum">233,233,323</div>
+                </div>
+                <div class="shui">
+                    <div class="shui-font"><em></em>总节水量</div>
+                    <div class="shui-font-num" id="waterSavingSum"></div>
+                </div>
+            </div>
+            <div class="location-table-line2">
+                <div class="map-font">用户所在位置得坐标和移动供热车得位置展示</div>
+                <div class="map"><img src="/images/map.png"/></div>
+            </div>
+        </div>
+        <!--内容区域用户所在位置得坐标和移动供热车得位置展示结束-->
+        <!--内容区域取热与供热对比图开始-->
+        <div class="db-table">
+            <div class="db-line1">
+                <div class="db-line1-title">取热与供热对比图（天）</div>
+                <div class="db-line1-top">
+                    <div id="zhe"></div>
+                </div>
+            </div>
+            <div class="db-line2">司机状态</div>
+            <div class="detailed-table">
+                <table id="driver_table">
+                    <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>车号</th>
+                        <th>时间</th>
+                        <th>状态</th>
+                        <th>路线</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="qian">
+                        <td>张春林</td>
+                        <td>晋A269PS</td>
+                        <td>2018-12-05  12:10</td>
+                        <td>运送中</td>
+                        <td>瑞光电厂-聚瑞地产</td>
+                    </tr>
+                    <tr class="shen">
+                        <td>候进喜</td>
+                        <td>晋A621RK</td>
+                        <td>2018-12-05  11:56</td>
+                        <td>运送中</td>
+                        <td>瑞光电厂-聚瑞地产</td>
+                    </tr>
+                    <tr class="qian">
+                        <td>闫志国</td>
+                        <td>晋A660NR</td>
+                        <td>2018-12-05  11:46</td>
+                        <td>运送中</td>
+                        <td>瑞光电厂-金世纪学校</td>
+                    </tr>
+                    <tr class="shen">
+                        <td>吴晋军</td>
+                        <td>晋A730PN</td>
+                        <td>2018-12-05  12:41</td>
+                        <td>运送中</td>
+                        <td>瑞光电厂-沃尔沃4s店</td>
+                    </tr>
+                    <tr class="qian">
+                        <td>白永寿</td>
+                        <td>晋A670ZE</td>
+                        <td>2018-12-05  13:56</td>
+                        <td>取热中</td>
+                        <td>瑞光电厂</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!--内容区域取热与供热对比图结束-->
+    </div>
+</th:block>
+<!--内容区域结束-->
+</body>
+</html>
+<script id="driver" type="text/html">
+    <tbody>
+    #{for(var i = 0; i < drivers.length; i++) {}#
+        #{if (i % 2 != 0){}#
+            <tr  class="qian">
+        #{}else{}#
+            <tr  class="shen">
+        #{}}#
+
+            <td>#{:=drivers[i].driverName}#</td>
+            <td>#{:=drivers[i].plateNumber}#</td>
+            <td>#{:=drivers[i].updateDate}#&nbsp;</td>
+            <td>#{:=drivers[i].state}#</td>
+            #{if (drivers[i].route && drivers[i].state == '运送中'){}#
+            <td>#{:=drivers[i].route}#</td>
+            #{}else{}#
+            <td>瑞光电厂</td>
+            #{}}#
+        </tr>
+    #{}}#
+    </tbody>
+</script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    var users = [[${users}]];
+
+    /*]]>*/
+</script>
+<script type="text/javascript">
+    var _ctx = $("meta[name='ctx']").attr("content");
+
+    if (!_ctx) {
+        _ctx = "";
+    }
+
+    $(function () {
+        var data = [{
+            item: '展厅',
+            count:3
+        }, {
+            item: '学校',
+            count:1
+        }, {
+            item: '工厂',
+            count:1
+        }];
+        var chart = new G2.Chart({
+            container: 'pic1',
+            forceFit: true,
+            padding: [0,100,0,0],
+            height: 338
+        });
+
+        var ds3 = new DataSet();
+        var dv3 = ds3.createView().source(data);
+        dv3.transform({
+            type: 'percent',
+            field: 'count',
+            dimension:'item',
+            as: 'percent'
+        });
+
+        chart.source(dv3);
+        chart.legend({
+            position: 'right-center',
+            itemMarginBottom:35,
+            textStyle:{
+                fontSize: '20'
+            }
+        });
+        chart.coord('theta', {
+            radius: 1
+        });
+
+        chart.intervalStack().position('percent').color('item',[ '#cc405d', '#d4af19','#2c2fb1' ]).opacity(1).label('percent', {
+            offset: -18,
+            textStyle: {
+                fill: 'white',
+                fontSize: 12,
+                shadowBlur: 2,
+                shadowColor: 'rgba(0, 0, 0, .45)'
+            },
+            rotate: 0,
+            autoRotate: false,
+            formatter: function formatter(text, item) {
+                return String(parseInt(item.point.percent * 100)) + '%';
+            }
+        });
+        chart.render();
+
+        var data1 = [];
+
+        var ds = new DataSet();
+        var dv = ds.createView().source(data1);
+        dv.transform({
+            type: 'percent',
+            field: 'heat',
+            dimension:'week',
+            as: 'percent'
+        });
+        var chart1 = new G2.Chart({
+            container: 'mountNode',
+            forceFit: true,
+            height: 441,
+            padding: [0,100,0,0]
+        });
+        chart1.source(dv);
+        chart1.tooltip(false);
+        chart1.legend({
+            position: 'right-center',
+            itemMarginBottom:35,
+            textStyle:{
+                fontSize: '20'
+            }
+        });
+        chart1.coord('theta', {
+            radius: 1,
+            innerRadius: 0.63
+        });
+        chart1.intervalStack().position('percent').color('week', ['#cc405d','#713bc6','#2c2fb1','#1c2c69','#147ce1','#28a754','#d4af19']).opacity(1).label('percent', {
+            offset: -18,
+            textStyle: {
+                fill: 'white',
+                fontSize: 12,
+                shadowBlur: 2,
+                shadowColor: 'rgba(0, 0, 0, .45)'
+            },
+            rotate: 0,
+            autoRotate: false,
+            formatter: function formatter(text, item) {
+                return String(parseInt(item.point.percent * 100)) + '%';
+            }
+        });
+
+        // 辅助文本
+        chart1.guide().html({
+            position: ['50%', '50%'],
+            html: '<div style="color:#8c8c8c;font-size: 25px;text-align: center;width: 10em;">一周</div>',
+            alignX: 'middle',
+            alignY: 'middle'
+        });
+        chart1.render();
+
+
+        // 在一行中保存多个城市的数据，需要将数据转换成
+// {month: 'Jan', city: 'Tokyo', temperature: 3.9}
+        var data2 = [{
+            week: '星期一',
+            quren: 7.0,
+            gongren: 3.9
+        }, {
+            week: '星期二',
+            quren: 6.9,
+            gongren: 4.2
+        }, {
+            week: '星期三',
+            quren: 9.5,
+            gongren: 5.7
+        }, {
+            week: '星期四',
+            quren: 14.5,
+            gongren: 8.5
+        }, {
+            week: '星期五',
+            quren: 18.4,
+            gongren: 11.9
+        }, {
+            week: '星期六',
+            quren: 21.5,
+            gongren: 15.2
+        }, {
+            week: '星期日',
+            quren: 25.2,
+            gongren: 17.0
+        }];
+        var ds2 = new DataSet();
+        var dv2 = ds2.createView().source(data2);
+// fold 方式完成了行列转换，如果不想使用 DataSet 直接手工转换数据即可
+        dv2.transform({
+            type: 'rename',
+            map: {
+                quren: '取热' // row.xxx 会被替换成 row.yyy
+            }
+        }).transform({
+            type: 'rename',
+            map: {
+                gongren: '供热' // row.xxx 会被替换成 row.yyy
+            }
+        }).transform({
+            type: 'fold',
+            fields: ['取热', '供热'], // 展开字段集
+            key: 'city', // key字段
+            value: 'temperature' // value字段
+        });
+        var chart2 = new G2.Chart({
+            container: 'zhe',
+            forceFit: true,
+            height: 471,
+            padding: [10,20,80,50]
+        });
+        chart2.source(dv2, {
+            week: {
+                range: [0, 1]
+            },
+            quren:{
+                alias: "取热"
+            },
+            gongren:{
+                alias: "供热"
+            }
+        });
+        chart2.axis('temperature', {
+            label: {
+                formatter: function formatter(val) {
+                    return val + 'MWH';
+                }
+            }
+        });
+        chart2.line().position('week*temperature').color('city',['#0386ff','#31c25d']);
+        chart2.point().position('week*temperature').color('city',['#0386ff','#31c25d']).size(4).shape('circle').style({
+            stroke: '#fff',
+            lineWidth: 1
+        });
+        chart2.render();
+
+        function pic() {
+
+        }
+        
+        function heatLine() {
+            $.get(_ctx + '/admin/stat/heat/all', function (data) {
+
+                $("#allHeatSum").html(data);
+
+                var coData = (data.replace(",","") * 278 * 0.785).toFixed(2);
+
+                $("#allCOSum").html(thousandBitSeparator(coData));
+
+            });
+
+            var myDate=new Date("2018/11/15 00:00:00")
+
+            var hour = getInervalHour(myDate,new Date());
+            console.log(hour);
+            $("#waterSavingSum").html(thousandBitSeparator((hour*25).toFixed(2)));
+        }
+
+        function userTable() {
+            //动态执行数据
+            $.getJSON(_ctx + '/admin/stat/driver', function (data) {
+                //template.config({sTag:"#{",eTag:"}#",compress: true});
+                //var tpl = document.getElementById('driver').innerHTML;
+                //$('#driver_table tbody').remove();
+                //$('#driver_table').append(template(tpl,{'drivers':data}));
+            });
+
+
+            //动态执行数据
+            $.getJSON(_ctx + '/admin/stat/heat/table/a', function (data) {
+                var ds = new DataSet();
+                var dv = ds.createView().source(data);
+                dv.transform({
+                    type: 'percent',
+                    field: 'heat',
+                    dimension:'week',
+                    as: 'percent'
+                });
+                chart1.changeData(dv);
+            });
+
+            //动态执行数据
+            $.getJSON(_ctx + '/admin/stat/heat/table/b', function (data) {
+                var ds2 = new DataSet();
+                var dv2 = ds2.createView().source(data);
+// fold 方式完成了行列转换，如果不想使用 DataSet 直接手工转换数据即可
+                dv2.transform({
+                    type: 'rename',
+                    map: {
+                        quren: '取热' // row.xxx 会被替换成 row.yyy
+                    }
+                }).transform({
+                    type: 'rename',
+                    map: {
+                        gongren: '供热' // row.xxx 会被替换成 row.yyy
+                    }
+                }).transform({
+                    type: 'fold',
+                    fields: ['取热', '供热'], // 展开字段集
+                    key: 'city', // key字段
+                    value: 'temperature' // value字段
+                });
+
+                chart2.changeData(dv2);
+            });
+
+
+            //动态执行数据
+            $.getJSON(_ctx + '/admin/stat/heat/table/c', function (data) {
+                var ds3 = new DataSet();
+                var dv3 = ds3.createView().source(data);
+                dv3.transform({
+                    type: 'percent',
+                    field: 'count',
+                    dimension:'item',
+                    as: 'percent'
+                });
+
+                chart.changeData(dv3);
+            });
+
+
+
+            $("#meterDiv").find('img').each(function(i,n){
+                var id = $(n).attr('id');
+                $.getJSON(_ctx + '/admin/stat/heat/table',{tableNumber:id}, function (data) {
+                    if(data.reportSeq  == null){
+                        $(n).attr('src','/images/pic4.png');
+                        console.log("关");
+                    }else{
+                        if(data.reportSeq % 2 == 1){
+                            $(n).attr('src','/images/sl.gif');
+                        }else{
+                            $(n).attr('src','/images/pic4.png');
+
+                        }
+                    }
+                    if(data.aggregateHeat){
+                        $("#meter"+i).html(data.aggregateHeat+"MWH");
+                    }else{
+                        $("#meter"+i).html("0MWH");
+                    }
+                });
+            });
+        }
+
+        heatLine();
+        setInterval(function () {
+            heatLine();
+        }, 10000);
+
+        userTable();
+        setInterval(function () {
+            userTable();
+        }, 10000);
+    });
+
+    function thousandBitSeparator(num) {
+        return num && (num
+                        .toString().indexOf('.') != -1 ? num.toString().replace(/(\d)(?=(\d{3})+\.)/g, function ($0, $1) {
+                    return $1 + ",";
+                }) : num.toString().replace(/(\d)(?=(\d{3}))/g, function ($0, $1) {
+                    return $1 + ",";
+                }));
+    }
+
+    function getInervalHour(startDate, endDate) {
+        var ms = endDate.getTime() - startDate.getTime();
+        if (ms < 0) return 0;
+        return Math.floor(ms / 1000 / 60 / 60);
+    }
+
+</script>

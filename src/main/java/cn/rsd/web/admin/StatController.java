@@ -1,11 +1,12 @@
 package cn.rsd.web.admin;
 
 import cn.rsd.dao.*;
-import cn.rsd.po.SupplyPosts;
-import cn.rsd.po.Trucks;
-import cn.rsd.po.Users;
+import cn.rsd.po.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,9 @@ public class StatController {
 
     @Autowired
     private MeterDataReportMapper meterDataReportMapper;
+
+    @Autowired
+    private MeterDataMapper meterDataMapper;
 
     @Autowired
     private SupplyPostsMapper supplyPostsMapper;
@@ -105,6 +109,30 @@ public class StatController {
 
         return view;
     }
+
+    @RequestMapping("index5")
+    public ModelAndView index5(){
+        ModelAndView view = new ModelAndView("stat5");
+
+        Double heatSum = this.statMapper.selectSumAllNumber();
+        view.addObject("heatSum",heatSum);
+
+        Users users = new Users();
+        users.setRole(4);
+        List<Users> list = this.usersMapper.select(users);
+
+        view.addObject("users",list);
+
+        MeterData meterData = new MeterData();
+        meterData.setUserType(1);
+
+        List<MeterData> meterDataList = this.meterDataMapper.select(meterData);
+
+        view.addObject("meterDataList",meterDataList);
+
+        return view;
+    }
+
     @RequestMapping("index3")
     public ModelAndView index3(){
         ModelAndView view = new ModelAndView("stat3");
@@ -133,13 +161,129 @@ public class StatController {
 
         return list;
     }
+    @RequestMapping("heat/table")
+    @ResponseBody
+    public MeterDataReport heatTable(String tableNumber){
+        MeterDataReport meterDataReport = null;
+        try{
+            meterDataReport = this.meterDataReportMapper.selectTabelAggregateHeat(tableNumber);
+        }catch (Exception e){
+            logger.error(e,e);
+        }
+
+        return meterDataReport;
+    }
+
+    @RequestMapping("heat/table/c")
+    @ResponseBody
+    public List<Map<String,Object>> heatTable3(){
+        List<Map<String,String>> list = new ArrayList<>();
+        List<Map<String,Object>> industryCategoryList = new ArrayList<>();
+        try{
+
+
+            MeterData meterData = new MeterData();
+            meterData.setUserType(2);
+
+            List<MeterData> meterDataList = this.meterDataMapper.select(meterData);
+            Map<String,Integer> countMap = new HashMap<>(10);
+            for(MeterData  meterData1:meterDataList){
+                if(countMap.containsKey(meterData1.getIndustryCategory())){
+                    countMap.put(meterData1.getIndustryCategory(),countMap.get(meterData1.getIndustryCategory())+1);
+                }else{
+                    countMap.put(meterData1.getIndustryCategory(),1);
+                }
+            }
+
+
+            countMap.forEach((k,v)->{
+                industryCategoryList.add(new HashMap<String, Object>(10){{
+                    put("item",k);
+                    put("count",v);
+                }});
+            });
+
+
+        }catch (Exception e){
+            logger.error(e,e);
+        }
+
+        return industryCategoryList;
+    }
+
+    @RequestMapping("heat/table/a")
+    @ResponseBody
+    public List<Map<String,Object>> heatTable1(){
+        List<Map<String,Object>> list = null;
+        try{
+            LocalDate d = LocalDate.now();
+            LocalDate.Property e = d.minusWeeks(1).dayOfWeek();
+
+            MeterData meterData = new MeterData();
+            meterData.setUserType(1);
+
+            List<MeterData> meterDataList = this.meterDataMapper.select(meterData);
+            LocalTime  localTime = new LocalTime(23,59,59);
+            list = this.statMapper.selectTableHeat(e.withMinimumValue().toDate(),e.withMaximumValue().toDateTime(localTime).toDate(),meterDataList);
+
+            for(Map<String,Object> map:list){
+                DateTime dt4 = new DateTime(map.get("runDate"));
+                map.put("week",dt4.toString("EE",Locale.CHINESE));
+                map.put("heat",map.get("heat"));
+            }
+        }catch (Exception e){
+            logger.error(e,e);
+        }
+
+        return list;
+    }
+
+    @RequestMapping("heat/table/b")
+    @ResponseBody
+    public List<Map<String,Object>> heatTable2(){
+        List<Map<String,Object>> list = null;
+        List<Map<String,Object>> list1 = null;
+        try{
+            LocalDate d = LocalDate.now();
+            LocalDate.Property e = d.minusWeeks(1).dayOfWeek();
+
+            MeterData meterData = new MeterData();
+            meterData.setUserType(2);
+            LocalTime  localTime = new LocalTime(23,59,59);
+            List<MeterData> meterDataList = this.meterDataMapper.select(meterData);
+            list = this.statMapper.selectTableHeat(e.withMinimumValue().toDate(),e.withMaximumValue().toDateTime(localTime).toDate(),meterDataList);
+
+            meterData.setUserType(1);
+            List<MeterData> meterDataList1 = this.meterDataMapper.select(meterData);
+            list1 = this.statMapper.selectTableHeat(e.withMinimumValue().toDate(),e.withMaximumValue().toDateTime(localTime).toDate(),meterDataList1);
+
+            for(Map<String,Object> map:list){
+                DateTime dt4 = new DateTime(map.get("runDate"));
+                map.put("week",dt4.toString("EE",Locale.CHINESE));
+                map.put("gongren",map.get("heat"));
+
+                for(Map<String,Object> map1:list1){
+                    DateTime dt41 = new DateTime(map1.get("runDate"));
+                    if(dt41.toString("EE",Locale.CHINESE).equals(map.get("week"))){
+                        map.put("quren",map1.get("heat"));
+                        break;
+                    }
+                }
+            }
+
+        }catch (Exception e){
+            logger.error(e,e);
+        }
+
+        return list;
+    }
 
     @RequestMapping("heat/table/line")
     @ResponseBody
     public List<Map<String,Object>> heatTableLine(){
         List<Map<String,Object>> list = null;
         try{
-            list = this.statMapper.selectTableNumberMeterData(new Date());
+            list = this.statMapper.selectTableNumberMeterData(null);
         }catch (Exception e){
             logger.error(e,e);
         }
@@ -151,7 +295,7 @@ public class StatController {
     public List<Map<String,Object>> heatTableLine1(){
         List<Map<String,Object>> list = null;
         try{
-            list = this.statMapper.selectTableNumberMeterData1(new Date());
+            list = this.statMapper.selectTableNumberMeterData(new Date());
         }catch (Exception e){
             logger.error(e,e);
         }
@@ -179,17 +323,12 @@ public class StatController {
         try{
             heatSum = this.statMapper.selectSumAllNumber();
 
-
         }catch (Exception e){
             logger.error(e,e);
         }
         format.setMaximumFractionDigits(2);
         return format.format(heatSum);
 
-    }
-
-    public static void main(String[] args){
-        System.out.println(randomDate("2018-01-01", "2018-11-01"));
     }
 
     @RequestMapping("user/heat/line")
@@ -272,6 +411,22 @@ public class StatController {
             return random(begin, end);
         }
         return rtn;
+    }
+    private static final String FORMATE_DATE = "yyyy-MM-dd";
+    private static final String FORMATE_SECONDS = "HH:mm:ss";
+    private static final String FORMATE_FULL = FORMATE_DATE.concat(" ").concat(FORMATE_SECONDS);
+
+    public static void main(String[] args){
+        LocalDate d = LocalDate.now();
+        LocalDate.Property e = d.minusWeeks(1).dayOfWeek();
+        LocalTime  localTime = new LocalTime(23,59,59);
+
+
+        DateTime dateTime = e.withMaximumValue().toDateTime(localTime);
+
+        System.out.println("上周的周一：" + e.withMinimumValue().toString("yyyy年MM月dd日 e", Locale.CHINESE));
+        System.out.println("上周的周日：" + dateTime.toString(FORMATE_FULL, Locale.CHINESE));
+
     }
 
 }

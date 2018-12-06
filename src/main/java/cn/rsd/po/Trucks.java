@@ -3,6 +3,7 @@ package cn.rsd.po;
 import cn.rsd.base.BasePo;
 
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * @author 焦云亮
@@ -53,6 +54,15 @@ public class Trucks extends BasePo{
     private Long userId;
     private Integer state;
     private Long supplyId;
+    private Date updateDate;
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 
     public Long getSupplyId() {
         return supplyId;

@@ -59,6 +59,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             ggUrl.add("/user");
             ggUrl.add("/order_msg.html");
             ggUrl.add("/order_warn.html");
+            ggUrl.add("/test.html");
 
             sjUrl.addAll(ggUrl);
             mfUrl.addAll(ggUrl);

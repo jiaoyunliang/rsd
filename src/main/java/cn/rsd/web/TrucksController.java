@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -103,6 +104,7 @@ public class TrucksController {
         Trucks trucks = new Trucks();
         trucks.setId(id);
         trucks.setState(state);
+        trucks.setUpdateDate(new Date());
         this.trucksMapper.updateByPrimaryKeySelective(trucks);
     }
 
