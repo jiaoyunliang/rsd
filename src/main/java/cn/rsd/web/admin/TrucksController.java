@@ -75,6 +75,18 @@ public class TrucksController {
         ReturnMessage message = ReturnMessage.buildMessage();
 
         try{
+
+            Trucks whereTruck = new Trucks();
+            whereTruck.setUserId(trucks.getUserId());
+            whereTruck = this.trucksMapper.selectOne(whereTruck);
+
+            if(whereTruck != null){
+                //如果和查找到来的对象id不等于才报重复异常.
+                if(!whereTruck.getId().equals(trucks.getId())) {
+                    throw new Exception("一个用户只能绑定一个车辆!");
+                }
+            }
+
             if(trucks.getId() == null) {
                 trucks.setState(Trucks.TrucksStateEnum.HEAT_STORAGE.value());
                 this.trucksMapper.insert(trucks);
