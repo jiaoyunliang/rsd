@@ -70,7 +70,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             sjUrl.add("/send_user.html");
             urls.put("role"+3L, sjUrl);
 
-            kfUrl.add("order_detail_preview.html");
+            kfUrl.add("/order_detail_preview.html");
             kfUrl.add("/trucks.html");
             kfUrl.add("/order.html");
             kfUrl.add("/login_user.html");
