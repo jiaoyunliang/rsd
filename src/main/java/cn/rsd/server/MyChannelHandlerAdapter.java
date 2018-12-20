@@ -9,6 +9,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.apache.ibatis.session.RowBounds;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -85,11 +86,14 @@ public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
                 e.printStackTrace();
             }
 
+            meterDataReport.setDataStr(dataStr);
+
             meterDataReport.setReportDate(new Date());
 //
             MeterData meterData = new MeterData();
             meterData.setTableNumber(meterDataReport.getTableNumber());
             meterData = this.meterDataMapper.selectOne(meterData);
+
             if(meterData != null) {
                 meterDataReport.setTableName(meterData.getTableName());
                 dataStr = dataStr.replaceAll("表号"+meterData.getTableNumber(),"表号"+meterData.getTableName());
@@ -117,30 +121,46 @@ public class MyChannelHandlerAdapter extends ChannelInboundHandlerAdapter {
 //
 
             if(meterDataReport.getTableNumber().equals("18082701")) {
+                int page = 0;
+                while (true) {
 
-                List<MeterDataReport> list = this.meterDataReportMapper.selectAll();
+                    List<MeterDataReport> list = this.meterDataReportMapper.selectByExampleAndRowBounds(null, new RowBounds(page * 30, 30));
 
-                for (MeterDataReport meterDataReport1 : list) {
+                    if (list == null || list.isEmpty()) {
+                        break;
+                    }
+                    page++;
+                    for (MeterDataReport meterDataReport1 : list) {
 
-                    MeterData meterData1 = new MeterData();
-                    meterData1.setTableNumber(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(50, 58))), -1, ""));
-                    meterData1 = this.meterDataMapper.selectOne(meterData1);
+                        MeterData meterData1 = new MeterData();
+                        meterData1.setTableNumber(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(50, 58))), -1, ""));
+                        meterData1 = this.meterDataMapper.selectOne(meterData1);
 
-                    if(meterData1 != null) {
-                        meterDataReport1.setTableName(meterData1.getTableName());
-                        meterDataReport1.setTableNumber(meterData1.getTableNumber());
+                        String dataStr1 = printNumber1(meterDataReport1.getHexStr());
+
+                        meterDataReport1.setDataStr(dataStr1);
+
+                        if (meterData1 != null) {
+                            meterDataReport1.setTableName(meterData1.getTableName());
+                            meterDataReport1.setTableNumber(meterData1.getTableNumber());
+
+
+                            dataStr1 = dataStr1.replaceAll("表号" + meterData1.getTableNumber(), "表号" + meterData1.getTableName());
+
+                            meterDataReport1.setDataStr(dataStr1);
+                        }
+
+                        meterDataReport1.setRunDate(DateTime.parse(f.parseLocalDateTime(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(142, 156))), -1, "")).toString("yyyy-MM-dd HH:mm:ss"), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate());
+
+                        meterDataReport1.setAggregateHeat(new Double(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(84, 92))), 2, ".")));
+                        this.meterDataReportMapper.updateByPrimaryKey(meterDataReport1);
                     }
 
-                    meterDataReport1.setRunDate(DateTime.parse(f.parseLocalDateTime(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(142, 156))), -1, "")).toString("yyyy-MM-dd HH:mm:ss"), DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate());
-
-                    meterDataReport1.setAggregateHeat(new Double(concatPoint(reverse(splitStr(meterDataReport1.getHexStr().substring(84, 92))), 2, ".")));
-                    this.meterDataReportMapper.updateByPrimaryKey(meterDataReport1);
                 }
             }
-            ctx.close();
 
         } finally {
-
+            ctx.close();
         }
     }
 
