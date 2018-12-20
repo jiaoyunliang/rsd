@@ -10,78 +10,18 @@
     <div class="container-fluid am-cf">
       <div class="row">
         <div class="am-u-sm-12 am-u-md-12 am-u-lg-9">
-          <div class="page-header-heading"><span class="am-icon-home page-header-heading-icon"></span> 首页 <small>季度报告</small></div>
+            <div class="page-header-heading"><span class="am-icon-home page-header-heading-icon"></span> 首页
+                <small>报告</small>
+            </div>
         </div>
       </div>
     </div>
     <div class="row-content am-cf">
-      <div class="row  am-cf">
-        <div class="am-u-sm-12 am-u-md-12 am-u-lg-4">
-          <div class="widget am-cf">
-            <div class="widget-head am-cf">
-              <div class="widget-title am-fl">当前正在进行的活动</div>
-
-            </div>
-            <div class="widget-body am-fr">
-              <div class="am-fl">
-                <div class="widget-fluctuation-period-text">
-                  报名人数100
-                  <button class="widget-fluctuation-tpl-btn">
-                    <i class="am-icon-calendar"></i>
-                    更多活动
-                  </button>
-                </div>
-              </div>
-              <div class="am-fr am-cf">
-                <div class="widget-fluctuation-description-amount text-success" am-cf>
-                  80
-                </div>
-                <div class="widget-fluctuation-description-text am-text-right">
-                  确认人数
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        <div class="am-u-sm-12 am-u-md-6 am-u-lg-4">
-          <div class="widget widget-primary am-cf">
-            <div class="widget-statistic-header">
-              本季度福利
-            </div>
-            <div class="widget-statistic-body">
-              <div class="widget-statistic-value">
-                2593件未领取
-              </div>
-              <div class="widget-statistic-description">
-                 已领取<strong>167件</strong>
-              </div>
-              <span class="widget-statistic-icon am-icon-credit-card-alt"></span>
-            </div>
-          </div>
-        </div>
-        <div class="am-u-sm-12 am-u-md-6 am-u-lg-4">
-          <div class="widget widget-purple am-cf">
-            <div class="widget-statistic-header">
-              本季度活动参加人次
-            </div>
-            <div class="widget-statistic-body">
-              <div class="widget-statistic-value">
-                3000
-              </div>
-              <div class="widget-statistic-description">
-                本季度比去年多参加 <strong>200</strong> 人次
-              </div>
-              <span class="widget-statistic-icon am-icon-support"></span>
-            </div>
-          </div>
-        </div>
-      </div>
       <div class="row am-cf">
         <div class="am-u-sm-12 am-u-md-12">
           <div class="widget am-cf">
             <div class="widget-head am-cf">
-              <div class="widget-title am-fl">上报数据情况</div>
+                <div class="widget-title am-fl">电厂上报数据</div>
               <div class="widget-function am-fr">
                 <a href="javascript:;" class="am-icon-cog"></a>
               </div>
@@ -107,18 +47,40 @@
           </div>
         </div>
       </div>
-      <div class="row am-cf">
-        <div class="am-u-sm-12 am-u-md-6">
-          <div class="widget am-cf">
-            <div class="widget-head am-cf">
-              <div class="widget-title am-fl">当前人员情况统计</div>
+        <div class="row am-cf">
+            <div class="am-u-sm-12 am-u-md-12">
+                <div class="widget am-cf">
+                    <div class="widget-head am-cf">
+                        <div class="widget-title am-fl">用户上报数据</div>
+                        <div class="widget-function am-fr">
+                            <a href="javascript:;" class="am-icon-cog"></a>
+                        </div>
+                    </div>
+                    <div class="widget-body  am-fr">
+                        <div class="am-scrollable-horizontal ">
+                            <div class="dataTables_wrapper am-datatable am-form-inline dt-amazeui no-footer">
+                                <table class="am-table am-table-compact am-text-nowrap tpl-table-black  dataTable no-footer"
+                                       id="example-r" role="grid" style="width: 100%;" width="100%">
+                                    <thead>
+                                    <tr role="row">
+                                        <th class="sorting_asc">上报数据</th>
+                                        <th class="sorting_asc">上报时间数据</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- more data -->
+                                    <tr th:each="meter,stat1 : ${meterData1}" class="even gradeC odd" role="row">
+                                        <td class="sorting_1" th:text="${meter.dataStr}"></td>
+                                        <td th:text="${#dates.format(meter.reportDate,'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="widget-body-md widget-body tpl-amendment-echarts am-fr" id="tpl-echarts">
-
-            </div>
-          </div>
         </div>
-      </div>
     </div>
   </div>
 </th:block>
