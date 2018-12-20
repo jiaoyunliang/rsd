@@ -17,7 +17,12 @@
         <resource.path>production</resource.path>
       </properties>
     </profile>
-
+      <profile>
+          <id>production</id>
+          <properties>
+              <resource.path>gl-production</resource.path>
+          </properties>
+      </profile>
   </profiles>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -209,7 +214,12 @@
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-all</artifactId>
-      <version>5.0.0.Alpha1</version>
+        <version>4.0.42.Final</version>
+    </dependency>
+      <dependency>
+          <groupId>org.apache.rocketmq</groupId>
+          <artifactId>rocketmq-client</artifactId>
+          <version>4.3.0</version>
     </dependency>
   </dependencies>
   <build>
