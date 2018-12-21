@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import tk.mybatis.mapper.entity.Example;
@@ -40,6 +41,12 @@ public class AdminController {
         return view;
     }
 
+    @RequestMapping("{page}")
+    public ModelAndView page(@PathVariable("page") String page) {
+        ModelAndView view = new ModelAndView(page);
+
+        return view;
+    }
     @RequestMapping("index")
     public ModelAndView index(){
         ModelAndView view = new ModelAndView("index");

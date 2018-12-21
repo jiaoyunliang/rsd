@@ -31,7 +31,8 @@
           <input type="password" class="tpl-form-input" name="password" id="password" placeholder="请输入密码">
 
         </div>
-        <div class="am-form-group tpl-login-remember-me" th:if="${param.error}">
+        <div class="am-form-group tpl-login-remember-me"
+             th:if="${session.SPRING_SECURITY_LAST_EXCEPTION != null && param.error}">
             <div class="am-alert am-alert-warning" th:text="${session.SPRING_SECURITY_LAST_EXCEPTION.message}" data-am-alert >
               <button type="button" class="am-close">&times;</button>
             </div>

@@ -1,9 +1,6 @@
 package cn.rsd.service.impl;
 
-import cn.rsd.dao.SupplyPostsMapper;
-import cn.rsd.dao.UserAccountMapper;
-import cn.rsd.dao.UserTrackMapper;
-import cn.rsd.dao.UsersMapper;
+import cn.rsd.dao.*;
 import cn.rsd.po.*;
 import cn.rsd.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +39,9 @@ public class UserServiceImpl implements UserService, UserDetailsService,ClientDe
     @Autowired
     private UserTrackMapper userTrackMapper;
 
+    @Autowired
+    private RolesMapper rolesMapper;
+
     @Override
     public Users loadByUserName(String userName) throws Exception {
         Users user = new Users();
@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService, UserDetailsService,ClientDe
         List<Long> roles = new ArrayList<>();
         roles.add(1L);
         roles.add(2L);
+        roles.add(5L);
 
         example.createCriteria().andEqualTo("userName",userName).andIn("role", roles);
 
@@ -65,7 +66,10 @@ public class UserServiceImpl implements UserService, UserDetailsService,ClientDe
         if(usersList == null || usersList.isEmpty()){
             throw new UsernameNotFoundException("用户名没有找到");
         }
-        return usersList.get(0);
+
+        Users user = usersList.get(0);
+
+        return user;
 
     }
 

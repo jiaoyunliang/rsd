@@ -6,7 +6,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author 焦云亮
@@ -21,7 +23,7 @@ public class Users extends BasePo implements UserDetails {
     private String address;
     private String company;
     private String phone;
-    private Integer role;
+    private Long role;
     private String openId;
     private Integer state;
     private String latitude;
@@ -134,17 +136,23 @@ public class Users extends BasePo implements UserDetails {
         this.phone = phone;
     }
 
-    public Integer getRole() {
+    public Long getRole() {
         return role;
     }
 
-    public void setRole(Integer role) {
+    public void setRole(Long role) {
         this.role = role;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+
+        List<Roles> rolesList = new ArrayList<>();
+        Roles role = new Roles();
+        role.setId(this.getRole());
+
+        rolesList.add(role);
+        return rolesList;
     }
 
     @Override

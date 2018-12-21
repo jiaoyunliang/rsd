@@ -16,7 +16,6 @@
     </bean>
 
     <security:http pattern="/admin/login" security="none"/>
-    <security:http pattern="/admin/stat/**" security="none"/>
     <security:http pattern="/404" security="none"/>
     <security:http pattern="/403" security="none"/>
     <security:http pattern="/500" security="none"/>
@@ -24,7 +23,7 @@
     <security:http pattern="/img" security="none"/>
     <security:http pattern="/images" security="none"/>
     <security:http pattern="/fonts" security="none"/>
-    <security:http pattern="/i/examples" security="none"/>
+    <security:http pattern="/i/**" security="none"/>
     <security:http pattern="/js" security="none"/>
     <security:http pattern="../webapp/statistic.html" security="none"/>
     <!--Oauth server start.............-->
@@ -183,8 +182,6 @@
                 login-page="/admin/login"
                 authentication-failure-url="/admin/login?error=true"
                 login-processing-url="/login_check"
-                always-use-default-target="true"
-                default-target-url="/admin/index"
                 authentication-success-handler-ref="myAuthenticationSuccessHandler"/>
         <!-- 认证成功用自定义类myAuthenticationSuccessHandler处理 -->
 
@@ -194,7 +191,9 @@
                          delete-cookies="JSESSIONID"/>
 
         <security:csrf disabled="true"/>
-        <security:intercept-url pattern="/admin/**" access="isAuthenticated()"/>
+        <security:access-denied-handler error-page="/admin/403"/>
+        <security:intercept-url pattern="/admin/stat/**" access="hasRole('ROLE_5')"/>
+        <security:intercept-url pattern="/admin/**" access="hasAnyRole('ROLE_1','ROLE_2')"/>
     </security:http>
 
     <security:authentication-manager id="authenticationManager">

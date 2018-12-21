@@ -1,0 +1,30 @@
+<!doctype html>
+<html class="no-js fixed-layout" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/layout">
+<head th:include="layout/layout :: htmlhead" th:with="title='403'">
+    <meta charset="utf-8">
+    <title></title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="tpl-content-wrapper">
+        <div class="row-content am-cf">
+            <div class="widget am-cf">
+                <div class="widget-body">
+                    <div class="tpl-page-state">
+                        <div class="tpl-page-state-title am-text-center tpl-error-title">403</div>
+                        <div class="tpl-error-title-info">Access Denied</div>
+                        <div class="tpl-page-state-content tpl-error-content">
+
+                            <p>对不起,没有访问权限。</p>
+                            <a th:href="@{/admin/login}"
+                               class="am-btn am-btn-secondary am-radius tpl-error-btn">重新登录</a></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

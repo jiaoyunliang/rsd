@@ -54,7 +54,7 @@ public class MyAuthenticationSuccessHandler extends
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.setAlwaysUseDefaultTargetUrl(true);
+        //this.setAlwaysUseDefaultTargetUrl(true);
         this.setDefaultTargetUrl("/admin/index");
         this.setTargetUrlParameter("gurl");
     }

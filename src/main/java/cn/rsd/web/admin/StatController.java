@@ -55,7 +55,7 @@ public class StatController {
         view.addObject("heatSum",heatSum);
 
         Users users = new Users();
-        users.setRole(4);
+        users.setRole(4L);
         List<Users> list = this.usersMapper.select(users);
 
         view.addObject("users",list);
@@ -71,7 +71,7 @@ public class StatController {
         view.addObject("heatSum",heatSum);
 
         Users users = new Users();
-        users.setRole(4);
+        users.setRole(4L);
         List<Users> list = this.usersMapper.select(users);
 
         view.addObject("users",list);
@@ -87,7 +87,7 @@ public class StatController {
         view.addObject("heatSum",heatSum);
 
         Users users = new Users();
-        users.setRole(4);
+        users.setRole(4L);
         List<Users> list = this.usersMapper.select(users);
 
         view.addObject("users",list);
@@ -102,7 +102,7 @@ public class StatController {
         view.addObject("heatSum",heatSum);
 
         Users users = new Users();
-        users.setRole(4);
+        users.setRole(4L);
         List<Users> list = this.usersMapper.select(users);
 
         view.addObject("users",list);
@@ -118,7 +118,7 @@ public class StatController {
         view.addObject("heatSum",heatSum);
 
         Users users = new Users();
-        users.setRole(4);
+        users.setRole(4L);
         List<Users> list = this.usersMapper.select(users);
 
         view.addObject("users",list);
@@ -141,7 +141,7 @@ public class StatController {
         view.addObject("heatSum",heatSum);
 
         Users users = new Users();
-        users.setRole(4);
+        users.setRole(4L);
         List<Users> list = this.usersMapper.select(users);
 
         view.addObject("users",list);
