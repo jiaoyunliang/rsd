@@ -23,7 +23,8 @@
     <security:http pattern="/img" security="none"/>
     <security:http pattern="/images" security="none"/>
     <security:http pattern="/fonts" security="none"/>
-    <security:http pattern="/i/**" security="none"/>
+    <security:http pattern="/i/*" security="none"/>
+    <security:http pattern="/i/*/**" security="none"/>
     <security:http pattern="/js" security="none"/>
     <security:http pattern="../webapp/statistic.html" security="none"/>
     <!--Oauth server start.............-->

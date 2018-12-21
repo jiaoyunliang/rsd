@@ -43,6 +43,14 @@ public class MyAuthenticationSuccessHandler extends
             List<Menu> menuList = userService.loadMenusByUserId(user.getId());
             request.getSession(true).setAttribute("user", user);
             request.getSession().setAttribute("menus",menuList);
+            //默认id是5的角色登录后转到统计页面.
+            if (user.getRole() == 5) {
+                this.setDefaultTargetUrl("/admin/stat/index5");
+                this.setAlwaysUseDefaultTargetUrl(true);
+            } else {
+                this.setDefaultTargetUrl("/admin/index");
+                this.setAlwaysUseDefaultTargetUrl(true);
+            }
         } catch (Exception e) {
             throw new IOException();
         }
