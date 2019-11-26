@@ -28,12 +28,10 @@
     以获得更好的体验！</p>
 <![endif]-->
 <div class="am-g tpl-g">
-<div th:replace="~{layout/header :: header}">Header</div>
-    <!-- sidebar start -->
-        <div th:replace="~{layout/left :: left}">left</div>
+    <div layout:fragment="content"></div>
     <!-- sidebar end -->
     <!-- content start -->
-    <div layout:fragment="content"></div>
+
     <!-- content end -->
 </div>
 <!--[if lt IE 9]>
